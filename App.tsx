@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, StatusBar as ReactStatusBar, ScrollView, RefreshControl } from 'react-native';
+import { StyleSheet, Text, View, StatusBar as ReactStatusBar, ScrollView, RefreshControl } from 'react-native';
 import { AppLoading } from 'expo';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts, Lato_400Regular } from '@expo-google-fonts/lato';
@@ -11,6 +11,7 @@ import Colours from './lib/colours';
 import Progress from './lib/components/progress';
 import Transactions from './lib/components/transactions';
 import { Toast, ToastType } from './lib/components/toast';
+import CurrencyHelpers from './lib/helpers/currency';
 
 export default () => {
     const [fontsLoaded] = useFonts({
@@ -57,9 +58,13 @@ class App extends React.Component<{}, IAppState> {
             />
 
             <ScrollView
-                style={styles.scroll}
                 refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={async () => await this.getBudget()}/>}
             >
+                <View style={styles.lastWeekContainer}>
+                    <Text style={styles.lastWeekText}>Last week's remaining balance:</Text>
+                    <Text style={styles.lastWeekAmount}>{CurrencyHelpers.format(budget.lastWeekRemaining)}</Text>
+                </View>
+
                 <Progress
                     budget={budget}
                     amount={amount}
@@ -114,7 +119,26 @@ const styles = StyleSheet.create({
         paddingTop: ReactStatusBar.currentHeight
     },
 
-    scroll: {
-        
+    lastWeekContainer: {
+        width: '100%',
+        marginTop: 25,
+        paddingLeft: 25,
+        paddingRight: 25,
+        flexDirection: 'row'
+    },
+
+    lastWeekText: {
+        flex: 3,
+        fontSize: 12,
+        color: Colours.text.lowlight,
+        fontFamily: 'Lato'
+    },
+
+    lastWeekAmount: {
+        flex: 1,
+        fontSize: 12,
+        color: Colours.text.default,
+        textAlign: 'right',
+        fontFamily: 'Lato'
     }
 });

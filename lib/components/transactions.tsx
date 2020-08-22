@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 import dayjs from 'dayjs';
 
 import { Budget, Transaction } from '../models';
@@ -14,9 +14,9 @@ export default class Transactions extends React.Component<ITransactionsProps> {
     render() {
         return <View style={styles.container}>
             {this.props.budget.transactions
-                .sort((first: Transaction, second: Transaction) => dayjs(first.date).isBefore(second.date) ? 1 : -1)
+                .sort((first: Transaction, second: Transaction) => this.sort(first, second))
                 .map((transaction: Transaction, index: number) => <TransactionView
-                    item={transaction}
+                    transaction={transaction}
                     key={transaction.description + index}
                     onToggle={() => this.onTransactionToggled(transaction)}
                 />)}
@@ -26,27 +26,39 @@ export default class Transactions extends React.Component<ITransactionsProps> {
     private onTransactionToggled(transaction: Transaction) {
         this.props.onTransactionToggled(transaction);
     }
+
+    private sort(first: Transaction, second: Transaction) : number {
+        const firstDate = dayjs(first.date).startOf('day'),
+            secondDate = dayjs(second.date).startOf('day');
+
+        if (firstDate.isSame(secondDate))
+            return first._id.localeCompare(second._id);
+
+        return dayjs(first.date).isBefore(second.date) ? 1 : -1
+    }
 }
 
-const TransactionView = ({ item, onToggle } : { item: Transaction, onToggle: () => void }) => (
-    <TouchableOpacity
-        style={[styles.transaction, item.ignored ? styles.transactionIgnored : null]}
-        onPress={() => onToggle()}
-        activeOpacity={0.5}
-    >
-        <View style={[styles.transactionOwner, { backgroundColor: item.owner === 'Chris' ? Colours.chris : Colours.sarah }]}></View>
-        <Text style={styles.transactionDate}>{dayjs(item.date).format('MM/DD')}</Text>
-        <Text style={styles.transactionDescription}>{item.description}</Text>
-        <Text style={styles.transactionAmount}>{`$${item.amount}`}</Text>
-    </TouchableOpacity>
-)
+class TransactionView extends React.Component<{ transaction: Transaction, onToggle: () => void }> {
+    render() {
+        const transaction = this.props.transaction;
+        return <TouchableWithoutFeedback
+            onPress={() => this.props.onToggle()}
+        >
+            <View style={[styles.transaction, transaction.ignored ? styles.transactionIgnored : null]}>
+                <View style={[styles.transactionOwner, { backgroundColor: transaction.owner === 'Chris' ? Colours.chris : Colours.sarah }]}></View>
+                <Text style={styles.transactionDate}>{dayjs(transaction.date).format('MM/DD')}</Text>
+                <Text style={styles.transactionDescription}>{transaction.description}</Text>
+                <Text style={styles.transactionAmount}>{`$${transaction.amount.toFixed(2)}`}</Text>
+            </View>
+        </TouchableWithoutFeedback>;
+    }
+}
 
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 25,
-        marginTop: 10
+        padding: 25
     },
 
     transaction: {
@@ -63,7 +75,7 @@ const styles = StyleSheet.create({
     },
 
     transactionIgnored: {
-        backgroundColor: 'transparent'
+        opacity: 0.3
     },
     
     transactionOwner: {
