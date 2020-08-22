@@ -78,9 +78,14 @@ class App extends React.Component<{}, IAppState> {
     }
 
     private async getBudget() {
-        this.setState({
-            budget: await BudgetApi.get()
-        });
+        try {
+            this.setState({
+                budget: await BudgetApi.get()
+            });
+        } catch (e) {
+            console.log(e);
+            this.toast.error('An error has occurred while retreiving this week\'s budget. Please try again later.');
+        }
     }
 
     private async onTransactionChanged(transaction: Transaction) {
@@ -90,11 +95,9 @@ class App extends React.Component<{}, IAppState> {
             await BudgetApi.updateTransaction(transaction);
         } catch (e) {
             console.log(e);
-
-            transaction.ignored = !transaction.ignored;
-            
             this.toast.error('An error has occurred while updating the transaction. Please try again later.');
 
+            transaction.ignored = !transaction.ignored;
             this.setState({
                 budget: this.state.budget
             });

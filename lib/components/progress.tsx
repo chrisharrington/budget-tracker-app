@@ -22,8 +22,8 @@ export default class Progress extends React.Component<IProgressProps> {
                 size={300}
                 width={10}
                 fill={amount / budget.weeklyAmount * 100}
-                tintColor={Colours.highlight}
-                backgroundColor={Colours.highlightDark}
+                tintColor={Colours.highlight.default}
+                backgroundColor={Colours.highlight.dark}
                 rotation={0}
             >
                 {
