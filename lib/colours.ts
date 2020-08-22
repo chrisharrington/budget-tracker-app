@@ -1,9 +1,13 @@
 export default class Colours {
-    static background: string = '#333333';
-    static backgroundLight: string = '#404040';
+    static highlight: string = '#edc61c';
+    static highlightDark: string = '#6d5906';
 
-    static highlight: string = '#EDC61C';
-    static highlightDark: string = '#6D5906';
+    static background = {
+        default: '#333333',
+        light: '#404040',
+        error: '#bd1e18',
+        success: '#35bd18'
+    };
 
     static text = {
         default: '#ffffff',

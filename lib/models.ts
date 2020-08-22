@@ -5,14 +5,14 @@ export class Id {
 export class Budget {
     weeklyAmount: number;
     lastWeekRemaining: number;
-    items: BudgetItem[];
+    transactions: Transaction[];
     
     constructor(initializer: Partial<Budget>) {
         Object.assign(this, initializer);
     }
 }
 
-export class BudgetItem extends Id {
+export class Transaction extends Id {
     amount: number;
     date: Date;
     description: string;

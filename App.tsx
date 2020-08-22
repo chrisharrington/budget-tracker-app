@@ -3,14 +3,14 @@ import { StyleSheet, View, StatusBar as ReactStatusBar, ScrollView, RefreshContr
 import { AppLoading } from 'expo';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts, Lato_400Regular } from '@expo-google-fonts/lato';
-import dayjs from 'dayjs';
 
 import BudgetApi from './lib/data/budget';
-import { Budget } from './lib/models';
+import { Budget, Transaction } from './lib/models';
 import Colours from './lib/colours';
 
 import Progress from './lib/components/progress';
 import Transactions from './lib/components/transactions';
+import { Toast, ToastType } from './lib/components/toast';
 
 export default () => {
     const [fontsLoaded] = useFonts({
@@ -25,13 +25,20 @@ interface IAppState {
     budget: Budget | null;
     loading: boolean;
     refreshing: boolean;
+
+    toastMessage: string;
+    toastType: ToastType;
 }
 
 class App extends React.Component<{}, IAppState> {
+    private toast: Toast;
+
     state = {
         budget: null,
         loading: false,
-        refreshing: false
+        refreshing: false,
+        toastMessage: '',
+        toastType: ToastType.Success
     }
 
     async componentDidMount() {
@@ -43,7 +50,7 @@ class App extends React.Component<{}, IAppState> {
         if (budget == null)
             return <View />;
 
-        const amount = budget.weeklyAmount - budget.items.filter(b => !b.ignored).map(b => b.amount).reduce((sum, amount) => sum + amount, 0);
+        const amount = budget.weeklyAmount - budget.transactions.filter(b => !b.ignored).map(b => b.amount).reduce((sum, amount) => sum + amount, 0);
         return <View style={styles.container}>
             <StatusBar
                 style='light'
@@ -60,10 +67,13 @@ class App extends React.Component<{}, IAppState> {
 
                 <Transactions
                     budget={budget}
-                    onBudgetChanged={(budget: Budget) => this.onBudgetChanged(budget)}
+                    onTransactionToggled={(transaction: Transaction) => this.onTransactionChanged(transaction)}
                 />
-                
             </ScrollView>
+
+            <Toast
+                ref={c => this.toast = c as Toast}
+            />
         </View>;
     }
 
@@ -73,8 +83,22 @@ class App extends React.Component<{}, IAppState> {
         });
     }
 
-    private onBudgetChanged(budget: Budget) {
-        this.setState({ budget });
+    private async onTransactionChanged(transaction: Transaction) {
+        try {
+            transaction.ignored = !transaction.ignored;
+            this.setState({ budget: this.state.budget });
+            await BudgetApi.updateTransaction(transaction);
+        } catch (e) {
+            console.log(e);
+
+            transaction.ignored = !transaction.ignored;
+            
+            this.toast.error('An error has occurred while updating the transaction. Please try again later.');
+
+            this.setState({
+                budget: this.state.budget
+            });
+        }
     }
 }
 
@@ -82,7 +106,7 @@ class App extends React.Component<{}, IAppState> {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: Colours.background,
+        backgroundColor: Colours.background.default,
         flexDirection: 'column',
         paddingTop: ReactStatusBar.currentHeight
     },

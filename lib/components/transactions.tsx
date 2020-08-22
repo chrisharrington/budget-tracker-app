@@ -2,39 +2,33 @@ import * as React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import dayjs from 'dayjs';
 
-import { Budget, BudgetItem } from '../models';
+import { Budget, Transaction } from '../models';
 import Colours from '../colours';
 
 interface ITransactionsProps {
     budget: Budget;
-    onBudgetChanged: (budget: Budget) => void;
+    onTransactionToggled: (transaction: Transaction) => void;
 }
 
 export default class Transactions extends React.Component<ITransactionsProps> {
     render() {
         return <View style={styles.container}>
-            {this.props.budget.items
-                .sort((first: BudgetItem, second: BudgetItem) => dayjs(first.date).isBefore(second.date) ? 1 : -1)
-                .map((item: BudgetItem, index: number) => <Transaction
-                    item={item}
-                    key={item.description + index}
-                    onToggle={() => this.onItemToggled(item)}
+            {this.props.budget.transactions
+                .sort((first: Transaction, second: Transaction) => dayjs(first.date).isBefore(second.date) ? 1 : -1)
+                .map((transaction: Transaction, index: number) => <TransactionView
+                    item={transaction}
+                    key={transaction.description + index}
+                    onToggle={() => this.onTransactionToggled(transaction)}
                 />)}
         </View>;
     }
 
-    private onItemToggled(item: BudgetItem) {
-        const budget = this.props.budget;
-        budget.items.forEach((i: BudgetItem) => {
-            if (i._id === item._id)
-                i.ignored = !i.ignored;
-        });
-
-        this.props.onBudgetChanged(budget);
+    private onTransactionToggled(transaction: Transaction) {
+        this.props.onTransactionToggled(transaction);
     }
 }
 
-const Transaction = ({ item, onToggle } : { item: BudgetItem, onToggle: () => void }) => (
+const TransactionView = ({ item, onToggle } : { item: Transaction, onToggle: () => void }) => (
     <TouchableOpacity
         style={[styles.transaction, item.ignored ? styles.transactionIgnored : null]}
         onPress={() => onToggle()}
@@ -59,9 +53,9 @@ const styles = StyleSheet.create({
         width: '100%',
         marginTop: 15,
         padding: 14,
-        backgroundColor: Colours.backgroundLight,
+        backgroundColor: Colours.background.light,
         borderWidth: 1,
-        borderColor: Colours.backgroundLight,
+        borderColor: Colours.background.light,
         flexDirection: 'row',
         position: 'relative',
         overflow: 'hidden',
