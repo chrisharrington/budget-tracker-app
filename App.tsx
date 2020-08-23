@@ -1,10 +1,14 @@
 import React from 'react';
-import { StyleSheet, Text, View, StatusBar as ReactStatusBar, ScrollView, RefreshControl } from 'react-native';
+import { StyleSheet, Text, View, StatusBar as ReactStatusBar, ScrollView, RefreshControl, Platform } from 'react-native';
 import { AppLoading } from 'expo';
 import { StatusBar } from 'expo-status-bar';
+import * as Permissions from 'expo-permissions';
+import * as Notifications from 'expo-notifications';
 import { useFonts, Lato_400Regular } from '@expo-google-fonts/lato';
 
 import BudgetApi from './lib/data/budget';
+import DeviceApi from './lib/data/device';
+
 import { Budget, Transaction } from './lib/models';
 import Colours from './lib/colours';
 
@@ -43,6 +47,12 @@ class App extends React.Component<{}, IAppState> {
     }
 
     async componentDidMount() {
+        const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+        if (status === Permissions.PermissionStatus.GRANTED) {
+            const token = await Notifications.getExpoPushTokenAsync();
+            await DeviceApi.registerToken(token.data);
+        }
+
         await this.getBudget();
     }
 
