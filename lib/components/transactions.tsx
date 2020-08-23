@@ -12,8 +12,10 @@ interface ITransactionsProps {
 
 export default class Transactions extends React.Component<ITransactionsProps> {
     render() {
+        const transactions = this.props.budget.transactions;
         return <View style={styles.container}>
-            {this.props.budget.transactions
+            {!transactions.length && <Text style={styles.noTransactionsText}>No transactions</Text>}
+            {(transactions || [])
                 .sort((first: Transaction, second: Transaction) => this.sort(first, second))
                 .map((transaction: Transaction, index: number) => <TransactionView
                     transaction={transaction}
@@ -107,5 +109,13 @@ const styles = StyleSheet.create({
         fontSize: 12,
         textAlign: 'right',
         fontFamily: 'Lato'
+    },
+
+    noTransactionsText: {
+        width: '100%',
+        textAlign: 'center',
+        color: Colours.text.lowlight,
+        fontSize: 12,
+        marginTop: 25
     }
 });

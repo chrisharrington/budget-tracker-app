@@ -15,7 +15,7 @@ interface IProgressProps {
 export default class Progress extends React.Component<IProgressProps> {
     render() {
         const budget = this.props.budget,
-            remainingDays = dayjs().endOf('w').add(1, 's').diff(dayjs().startOf('d'), 'd')+1,
+            remainingDays = this.getRemainingDays(),
             amount = this.props.amount,
             isNegative = amount < 0;
 
@@ -38,6 +38,18 @@ export default class Progress extends React.Component<IProgressProps> {
                 }
             </AnimatedCircularProgress>
         </View>;
+    }
+
+    private getRemainingDays() : number {
+        let remaining = 0,
+            date = dayjs().startOf('d');
+
+        while (date.day() !== 1) {
+            date = date.add(1, 'day');
+            remaining++;
+        }
+
+        return remaining === 0 ? 7 : remaining;
     }
 }
 
