@@ -105,3 +105,4 @@ dist
 
 # Secret files should not be checked in
 secret.ts
+google-services.json
