@@ -90,21 +90,21 @@ const styles = StyleSheet.create({
     transactionDate: {
         flex: 1,
         color: Colours.text.lowlight,
-        fontSize: 14,
+        fontSize: 12,
         fontFamily: 'Lato'
     },
 
     transactionDescription: {
         flex: 2,
         color: Colours.text.default,
-        fontSize: 14,
+        fontSize: 12,
         fontFamily: 'Lato'
     },
 
     transactionAmount: {
         flex: 1,
         color: Colours.text.default,
-        fontSize: 14,
+        fontSize: 12,
         textAlign: 'right',
         fontFamily: 'Lato'
     }
