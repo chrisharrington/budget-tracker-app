@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, StatusBar as ReactStatusBar, ScrollView, RefreshControl, Platform } from 'react-native';
+import { StyleSheet, Text, View, StatusBar as ReactStatusBar, ScrollView, RefreshControl } from 'react-native';
 import { AppLoading } from 'expo';
 import { StatusBar } from 'expo-status-bar';
 import * as Permissions from 'expo-permissions';
@@ -16,6 +16,7 @@ import Progress from './lib/components/progress';
 import Transactions from './lib/components/transactions';
 import { Toast, ToastType } from './lib/components/toast';
 import CurrencyHelpers from './lib/helpers/currency';
+
 
 export default () => {
     const [fontsLoaded] = useFonts({
@@ -40,7 +41,7 @@ class App extends React.Component<{}, IAppState> {
 
     state = {
         budget: null,
-        loading: false,
+        loading: true,
         refreshing: false,
         toastMessage: '',
         toastType: ToastType.Success
@@ -59,7 +60,7 @@ class App extends React.Component<{}, IAppState> {
     render() {
         const budget = this.state.budget as Budget | null;
         if (budget == null)
-            return <View />;
+            return <View style={styles.loading} />;
 
         const amount = budget.weeklyAmount - budget.transactions.filter(b => !b.ignored).map(b => b.amount).reduce((sum, amount) => sum + amount, 0);
         return <View style={styles.container}>
@@ -150,5 +151,10 @@ const styles = StyleSheet.create({
         color: Colours.text.default,
         textAlign: 'right',
         fontFamily: 'Lato'
+    },
+
+    loading: {
+        backgroundColor: '#333333',
+        flex: 1
     }
 });
