@@ -1,22 +1,24 @@
 import React from 'react';
-import { StyleSheet, Text, View, StatusBar as ReactStatusBar, ScrollView, RefreshControl } from 'react-native';
+import { StyleSheet, View, Text, StatusBar as ReactStatusBar, TouchableOpacity } from 'react-native';
 import { AppLoading } from 'expo';
 import { StatusBar } from 'expo-status-bar';
 import * as Permissions from 'expo-permissions';
 import * as Notifications from 'expo-notifications';
 import { useFonts, Lato_400Regular } from '@expo-google-fonts/lato';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-import BudgetApi from './lib/data/budget';
 import DeviceApi from './lib/data/device';
 
-import { Budget, Transaction } from './lib/models';
 import Colours from './lib/colours';
 
-import Progress from './lib/components/progress';
-import Transactions from './lib/components/transactions';
 import { Toast, ToastType } from './lib/components/toast';
-import CurrencyHelpers from './lib/helpers/currency';
 
+import BalanceView from './lib/views/balance';
+import HistoryView from './lib/views/history';
+
+
+const Tab = createBottomTabNavigator();
 
 export default () => {
     const [fontsLoaded] = useFonts({
@@ -28,10 +30,6 @@ export default () => {
 
 
 interface IAppState {
-    budget: Budget | null;
-    loading: boolean;
-    refreshing: boolean;
-
     toastMessage: string;
     toastType: ToastType;
 }
@@ -40,9 +38,6 @@ class App extends React.Component<{}, IAppState> {
     private toast: Toast;
 
     state = {
-        budget: null,
-        loading: true,
-        refreshing: false,
         toastMessage: '',
         toastType: ToastType.Success
     }
@@ -54,70 +49,63 @@ class App extends React.Component<{}, IAppState> {
             await DeviceApi.registerToken(token.data);
         }
 
-        await this.getBudget();
+        
     }
 
     render() {
-        const budget = this.state.budget as Budget | null;
-        if (budget == null)
-            return <View style={styles.loading} />;
-
-        const amount = budget.weeklyAmount - budget.transactions.filter(b => !b.ignored).map(b => b.amount).reduce((sum, amount) => sum + amount, 0);
         return <View style={styles.container}>
             <StatusBar
                 style='light'
             />
 
-            <ScrollView
-                refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={async () => await this.getBudget()}/>}
-            >
-                <View style={styles.lastWeekContainer}>
-                    <Text style={styles.lastWeekText}>Last week's remaining balance:</Text>
-                    <Text style={styles.lastWeekAmount}>{CurrencyHelpers.format(budget.lastWeekRemaining)}</Text>
-                </View>
-
-                <Progress
-                    budget={budget}
-                    amount={amount}
-                />
-
-                <Transactions
-                    budget={budget}
-                    onTransactionToggled={(transaction: Transaction) => this.onTransactionChanged(transaction)}
-                />
-            </ScrollView>
+            <NavigationContainer>
+                <Tab.Navigator
+                    tabBar={props => <TabBar {...props} />}
+                >
+                    <Tab.Screen name='Balance' children={() => <BalanceView
+                        style={{ marginBottom: 60 }}
+                        onError={(message: string) => this.toast.error(message)}
+                    />} />
+                    <Tab.Screen name='History' children={() => <HistoryView
+                        style={{ marginBottom: 60 }}
+                        onError={(message: string) => this.toast.error(message)}
+                    />} />
+                </Tab.Navigator>
+            </NavigationContainer>
 
             <Toast
                 ref={c => this.toast = c as Toast}
             />
         </View>;
     }
+}
 
-    private async getBudget() {
-        try {
-            this.setState({
-                budget: await BudgetApi.get()
-            });
-        } catch (e) {
-            console.log(e);
-            this.toast.error('An error has occurred while retreiving this week\'s budget. Please try again later.');
-        }
+
+class TabBar extends React.Component<any> {
+    render() {
+        return <View style={styles.tabBar}>
+            {this.props.state.routes.map((route, index) => (
+                <TouchableOpacity
+                    key={route.key}
+                    style={[styles.tabButton, index === 0 ? styles.tabButtonFirst : null]}
+                    activeOpacity={1}
+                    onPress={() => this.onPress(route, index)}
+                >
+                    <Text style={[styles.tabButtonText, , index === this.props.state.index ? styles.tabButtonTextSelected : null]}>{route.name}</Text>
+                </TouchableOpacity>
+            ))}
+        </View>;
     }
 
-    private async onTransactionChanged(transaction: Transaction) {
-        try {
-            transaction.ignored = !transaction.ignored;
-            this.setState({ budget: this.state.budget });
-            await BudgetApi.updateTransaction(transaction);
-        } catch (e) {
-            console.log(e);
-            this.toast.error('An error has occurred while updating the transaction. Please try again later.');
+    private onPress(route, index) {
+        const event = this.props.navigation.emit({
+            type: 'tabPress',
+            target: route.key,
+            canPreventDefault: true,
+        });
 
-            transaction.ignored = !transaction.ignored;
-            this.setState({
-                budget: this.state.budget
-            });
-        }
+        if (!event.defaultPrevented && this.props.state.index !== index)
+            this.props.navigation.navigate(route.name);
     }
 }
 
@@ -130,31 +118,38 @@ const styles = StyleSheet.create({
         paddingTop: ReactStatusBar.currentHeight
     },
 
-    lastWeekContainer: {
+    tabBar: {
+        backgroundColor: Colours.background.dark,
+        height: 60,
         width: '100%',
-        marginTop: 25,
-        paddingLeft: 25,
-        paddingRight: 25,
+        position: 'absolute',
+        bottom: 0,
         flexDirection: 'row'
     },
 
-    lastWeekText: {
-        flex: 3,
-        fontSize: 12,
-        color: Colours.text.lowlight,
-        fontFamily: 'Lato'
-    },
-
-    lastWeekAmount: {
+    tabButton: {
         flex: 1,
-        fontSize: 12,
-        color: Colours.text.default,
-        textAlign: 'right',
-        fontFamily: 'Lato'
+        alignItems: 'center',
+        borderLeftWidth: 1,
+        borderLeftColor: Colours.background.default
     },
 
-    loading: {
-        backgroundColor: '#333333',
-        flex: 1
+    tabButtonFirst: {
+        borderLeftWidth: 0
+    },
+
+    tabButtonText: {
+        color: Colours.text.default,
+        textTransform: 'uppercase',
+        fontSize: 16,
+        fontWeight: 'bold',
+        fontFamily: 'Lato',
+        marginTop: 15,
+        paddingBottom: 3
+    },
+
+    tabButtonTextSelected: {
+        borderBottomWidth: 2,
+        borderBottomColor: Colours.highlight.default
     }
 });

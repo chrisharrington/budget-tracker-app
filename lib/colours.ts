@@ -2,6 +2,7 @@ export default class Colours {
     static background = {
         default: '#333333',
         light: '#404040',
+        dark: '#2a2a2a',
         error: '#bd1e18',
         success: '#35bd18'
     };
@@ -13,7 +14,9 @@ export default class Colours {
 
     static text = {
         default: '#ffffff',
-        lowlight: '#aaaaaa'
+        lowlight: '#aaaaaa',
+        success: '#1edf24',
+        error: '#FA4539'
     };
 
     static chris: string = '#46D3FF';

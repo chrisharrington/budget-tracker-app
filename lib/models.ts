@@ -19,3 +19,8 @@ export class Transaction extends Id {
     owner: string;
     ignored: boolean;
 }
+
+export class History {
+    date: Date;
+    balance: number;
+}

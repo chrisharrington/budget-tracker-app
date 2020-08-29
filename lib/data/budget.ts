@@ -1,4 +1,4 @@
-import { Budget, Transaction } from '../models';
+import { Budget, Transaction, History } from '../models';
 import Config from '../config';
 import Secret from '../secret';
 
@@ -12,6 +12,19 @@ export default class BudgetApi {
 
         if (response.status !== 200)
             throw new Error(`Error while retreiving budget. ${response.status}`);
+
+        return await response.json();
+    }
+
+    static async history() : Promise<History[]> {
+        const response = await fetch(`${Config.ApiUrl}/history`, {
+            headers: new Headers({
+                'Authorization': Secret.apiKey
+            })
+        });
+
+        if (response.status !== 200)
+            throw new Error(`Error while retrieving history. ${response.status}`);
 
         return await response.json();
     }
