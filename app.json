@@ -4,7 +4,6 @@
     "slug": "budget-tracker-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -30,6 +29,13 @@
     "androidStatusBar": {
       "barStyle": "light-content",
       "backgroundColor": "#333333"
+    },
+    "notification": {
+        "icon": "./assets/status-bar-icon.png"
+    },
+    "adaptiveIcon": {
+        "foregroundImage": "./assets/icon-foreground.png",
+        "backgroundColor": "#059C6B"
     }
   }
 }
