@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl, AppState, AppStateStatus } from 'react-native';
 import dayjs from 'dayjs';
 
 import Colours from '../colours';
@@ -12,6 +12,7 @@ import CurrencyHelper from '../helpers/currency';
 
 interface IHistoryViewProps {
     style?: any;
+    appState: AppStateStatus;
     onError: (message: string) => void;
 }
 
@@ -23,11 +24,16 @@ interface IHistoryViewState {
 export default class HistoryView extends React.Component<IHistoryViewProps, IHistoryViewState> {
     state = {
         history: [],
-        refreshing: false
+        refreshing: false,
     }
 
     async componentDidMount() {
         await this.getHistory();
+    }
+
+    async componentDidUpdate(prev: IHistoryViewProps) {
+        if (prev.appState.match(/background|inactive/) && this.props.appState === 'active')
+            await this.getHistory();
     }
 
     render() {

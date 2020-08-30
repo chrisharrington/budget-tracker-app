@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, Text, View, ScrollView, RefreshControl } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, RefreshControl, AppState, AppStateStatus } from 'react-native';
 
 import CurrencyHelpers from '../helpers/currency';
 
@@ -14,6 +14,7 @@ import Transactions from '../components/transactions';
 
 interface IBalanceViewProps {
     style?: any;
+    appState: AppStateStatus;
     onError: (message: string) => void;
 }
 
@@ -26,11 +27,16 @@ export default class BalanceView extends React.Component<IBalanceViewProps, IBal
     state = {
         budget: null,
         loading: true,
-        refreshing: false
+        refreshing: false,
     }
 
     async componentDidMount() {
         await this.getBudget();
+    }
+    
+    async componentDidUpdate(prev: IBalanceViewProps) {
+        if (prev.appState.match(/background|inactive/) && this.props.appState === 'active')
+            await this.getBudget();
     }
 
     render() {

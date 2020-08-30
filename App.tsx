@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Text, StatusBar as ReactStatusBar, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, StatusBar as ReactStatusBar, TouchableOpacity, AppState, AppStateStatus } from 'react-native';
 import { AppLoading } from 'expo';
 import { StatusBar } from 'expo-status-bar';
 import * as Permissions from 'expo-permissions';
@@ -32,6 +32,7 @@ export default () => {
 interface IAppState {
     toastMessage: string;
     toastType: ToastType;
+    appState: AppStateStatus;
 }
 
 class App extends React.Component<{}, IAppState> {
@@ -39,18 +40,22 @@ class App extends React.Component<{}, IAppState> {
 
     state = {
         toastMessage: '',
-        toastType: ToastType.Success
+        toastType: ToastType.Success,
+        appState: AppState.currentState
     }
 
     async componentDidMount() {
-        if (__DEV__)
-            return;
-
-        const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
-        if (status === Permissions.PermissionStatus.GRANTED) {
-            const token = await Notifications.getExpoPushTokenAsync();
-            await DeviceApi.registerToken(token.data);
+        if (!__DEV__) {
+            const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+            if (status === Permissions.PermissionStatus.GRANTED) {
+                const token = await Notifications.getExpoPushTokenAsync();
+                await DeviceApi.registerToken(token.data);
+            }
         }
+
+        AppState.addEventListener('change', async (nextState: AppStateStatus) => {
+            this.setState({ appState: nextState });
+        });
     }
 
     render() {
@@ -65,10 +70,12 @@ class App extends React.Component<{}, IAppState> {
                 >
                     <Tab.Screen name='Balance' children={() => <BalanceView
                         style={{ marginBottom: 60 }}
+                        appState={this.state.appState}
                         onError={(message: string) => this.toast.error(message)}
                     />} />
                     <Tab.Screen name='History' children={() => <HistoryView
                         style={{ marginBottom: 60 }}
+                        appState={this.state.appState}
                         onError={(message: string) => this.toast.error(message)}
                     />} />
                 </Tab.Navigator>
