@@ -43,13 +43,14 @@ class App extends React.Component<{}, IAppState> {
     }
 
     async componentDidMount() {
+        if (__DEV__)
+            return;
+
         const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
         if (status === Permissions.PermissionStatus.GRANTED) {
             const token = await Notifications.getExpoPushTokenAsync();
             await DeviceApi.registerToken(token.data);
         }
-
-        
     }
 
     render() {
