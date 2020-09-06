@@ -30,8 +30,8 @@ export default class Transactions extends React.Component<ITransactionsProps> {
     }
 
     private sort(first: Transaction, second: Transaction) : number {
-        const firstDate = dayjs(first.date).startOf('day'),
-            secondDate = dayjs(second.date).startOf('day');
+        const firstDate = dayjs(first.date),
+            secondDate = dayjs(second.date);
 
         if (firstDate.isSame(secondDate))
             return first._id.localeCompare(second._id);
