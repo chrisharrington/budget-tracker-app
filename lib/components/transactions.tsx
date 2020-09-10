@@ -1,16 +1,29 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import Modal from 'react-native-modal';
 import dayjs from 'dayjs';
 
 import { Budget, Transaction } from '../models';
 import Colours from '../colours';
 
+import TransactionModal from './transaction-modal';
+
 interface ITransactionsProps {
     budget: Budget;
-    onTransactionToggled: (transaction: Transaction) => void;
+    onChange: (transaction: Transaction) => void;
+    onSelect: (transaction: Transaction | null) => void;
+    onError: (message: string) => void;
 }
 
-export default class Transactions extends React.Component<ITransactionsProps> {
+interface ITransactionsState {
+    transaction: Transaction | null;
+}
+
+export default class Transactions extends React.Component<ITransactionsProps, ITransactionsState> {
+    state = {
+        transaction: null
+    }
+
     render() {
         const transactions = this.props.budget.transactions;
         return <View style={styles.container}>
@@ -20,13 +33,21 @@ export default class Transactions extends React.Component<ITransactionsProps> {
                 .map((transaction: Transaction, index: number) => <TransactionView
                     transaction={transaction}
                     key={transaction.description + index}
-                    onToggle={() => this.onTransactionToggled(transaction)}
+                    onToggle={() => this.onToggle(transaction)}
+                    onLongPress={() => this.setState({ transaction })}
                 />)}
+
+            <TransactionModal
+                transaction={this.state.transaction}
+                onClose={() => this.setState({ transaction: null })}
+                onChange={(transaction: Transaction) => this.props.onChange(transaction)}
+            />
         </View>;
     }
 
-    private onTransactionToggled(transaction: Transaction) {
-        this.props.onTransactionToggled(transaction);
+    private onToggle(transaction: Transaction) {
+        transaction.ignored = !transaction.ignored;
+        this.props.onChange(transaction);
     }
 
     private sort(first: Transaction, second: Transaction) : number {
@@ -40,11 +61,13 @@ export default class Transactions extends React.Component<ITransactionsProps> {
     }
 }
 
-class TransactionView extends React.Component<{ transaction: Transaction, onToggle: () => void }> {
+class TransactionView extends React.Component<{ transaction: Transaction, onToggle: () => void, onLongPress: () => void }> {
     render() {
         const transaction = this.props.transaction;
-        return <TouchableWithoutFeedback
+        return <TouchableOpacity
             onPress={() => this.props.onToggle()}
+            onLongPress={() => this.props.onLongPress()}
+            activeOpacity={0.8}
         >
             <View style={[styles.transaction, transaction.ignored ? styles.transactionIgnored : null]}>
                 <View style={[styles.transactionOwner, { backgroundColor: transaction.owner === 'Chris' ? Colours.chris : Colours.sarah }]}></View>
@@ -52,7 +75,7 @@ class TransactionView extends React.Component<{ transaction: Transaction, onTogg
                 <Text style={styles.transactionDescription}>{transaction.description}</Text>
                 <Text style={styles.transactionAmount}>{`$${transaction.amount.toFixed(2)}`}</Text>
             </View>
-        </TouchableWithoutFeedback>;
+        </TouchableOpacity>;
     }
 }
 

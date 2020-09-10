@@ -12,6 +12,8 @@ import DeviceApi from './lib/data/device';
 
 import Colours from './lib/colours';
 
+import { Transaction } from './lib/models';
+
 import { Toast, ToastType } from './lib/components/toast';
 
 import BalanceView from './lib/views/balance';
@@ -33,6 +35,7 @@ interface IAppState {
     toastMessage: string;
     toastType: ToastType;
     appState: AppStateStatus;
+    selectedTransaction: Transaction | null;
 }
 
 class App extends React.Component<{}, IAppState> {
@@ -41,7 +44,8 @@ class App extends React.Component<{}, IAppState> {
     state = {
         toastMessage: '',
         toastType: ToastType.Success,
-        appState: AppState.currentState
+        appState: AppState.currentState,
+        selectedTransaction: null
     }
 
     async componentDidMount() {
@@ -68,11 +72,18 @@ class App extends React.Component<{}, IAppState> {
                 <Tab.Navigator
                     tabBar={props => <TabBar {...props} />}
                 >
-                    <Tab.Screen name='Balance' children={() => <BalanceView
-                        style={{ marginBottom: 60 }}
-                        appState={this.state.appState}
-                        onError={(message: string) => this.toast.error(message)}
-                    />} />
+                    <Tab.Screen
+                        name='Balance'
+                        options={() => ({
+                            tabBarVisible: false
+                        })}
+                        children={() => <BalanceView
+                            style={{ marginBottom: 60 }}
+                            appState={this.state.appState}
+                            onError={(message: string) => this.toast.error(message)}
+                            onTransactionSelected={(transaction: Transaction | null) => this.setState({ selectedTransaction: transaction })}
+                        />}
+                    />
                     <Tab.Screen name='History' children={() => <HistoryView
                         style={{ marginBottom: 60 }}
                         appState={this.state.appState}
@@ -129,7 +140,8 @@ const styles = StyleSheet.create({
     tabBar: {
         backgroundColor: Colours.background.dark,
         height: 60,
-        width: '100%',
+        left: 0,
+        right: 0,
         position: 'absolute',
         bottom: 0,
         flexDirection: 'row'

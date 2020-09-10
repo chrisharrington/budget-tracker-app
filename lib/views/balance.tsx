@@ -16,6 +16,7 @@ interface IBalanceViewProps {
     style?: any;
     appState: AppStateStatus;
     onError: (message: string) => void;
+    onTransactionSelected: (transaction: Transaction | null) => void;
 }
 
 interface IBalanceViewstate {
@@ -61,7 +62,9 @@ export default class BalanceView extends React.Component<IBalanceViewProps, IBal
 
             <Transactions
                 budget={budget}
-                onTransactionToggled={(transaction: Transaction) => this.onTransactionChanged(transaction)}
+                onChange={(transaction: Transaction) => this.onTransactionChanged(transaction)}
+                onSelect={(transaction: Transaction | null) => this.props.onTransactionSelected(transaction)}
+                onError={(message: string) => this.props.onError(message)}
             />
         </ScrollView>;
     }
@@ -79,7 +82,6 @@ export default class BalanceView extends React.Component<IBalanceViewProps, IBal
 
     private async onTransactionChanged(transaction: Transaction) {
         try {
-            transaction.ignored = !transaction.ignored;
             this.setState({ budget: this.state.budget });
             await BudgetApi.updateTransaction(transaction);
         } catch (e) {

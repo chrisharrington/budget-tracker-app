@@ -19,6 +19,11 @@ export default class Colours {
         error: '#FA4539'
     };
 
+    static button = {
+        negative: Colours.background.dark,
+        positive: '#38A501'
+    };
+
     static chris: string = '#46D3FF';
     static sarah: string = '#fc0fc0';
 }
