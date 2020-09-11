@@ -9,10 +9,11 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import DeviceApi from './lib/data/device';
+import BudgetApi from './lib/data/budget';
 
 import Colours from './lib/colours';
 
-import { Transaction } from './lib/models';
+import { Transaction, Budget, History } from './lib/models';
 
 import { Toast, ToastType } from './lib/components/toast';
 
@@ -30,22 +31,37 @@ export default () => {
     return fontsLoaded ? <App /> : <AppLoading />;
 }
 
+interface IAppProps {
+    appState: AppStateStatus;
+}
 
 interface IAppState {
+    ready: boolean;
+    refreshing: boolean;
+    budget: Budget | null;
+    histories: History[];
     toastMessage: string;
     toastType: ToastType;
     appState: AppStateStatus;
     selectedTransaction: Transaction | null;
 }
 
-class App extends React.Component<{}, IAppState> {
+class App extends React.Component<IAppProps, IAppState> {
     private toast: Toast;
 
     state = {
+        ready: false,
+        refreshing: false,
+        budget: null,
+        histories: [],
         toastMessage: '',
         toastType: ToastType.Success,
         appState: AppState.currentState,
         selectedTransaction: null
+    }
+
+    async componentDidUpdate(prev: IAppProps) {
+        
     }
 
     async componentDidMount() {
@@ -57,13 +73,18 @@ class App extends React.Component<{}, IAppState> {
             }
         }
 
+        await this.getData();
+        this.setState({ ready: true });
+
         AppState.addEventListener('change', async (nextState: AppStateStatus) => {
+            if (this.state.appState.match(/background|inactive/) && nextState === 'active')
+                await this.getData();
             this.setState({ appState: nextState });
         });
     }
 
     render() {
-        return <View style={styles.container}>
+        return this.state.ready ? <View style={styles.container}>
             <StatusBar
                 style='light'
             />
@@ -79,15 +100,20 @@ class App extends React.Component<{}, IAppState> {
                         })}
                         children={() => <BalanceView
                             style={{ marginBottom: 60 }}
-                            appState={this.state.appState}
+                            refreshing={this.state.refreshing}
+                            budget={this.state.budget}
                             onError={(message: string) => this.toast.error(message)}
                             onTransactionSelected={(transaction: Transaction | null) => this.setState({ selectedTransaction: transaction })}
+                            onRefresh={async () => await this.getData()}
                         />}
                     />
+
                     <Tab.Screen name='History' children={() => <HistoryView
                         style={{ marginBottom: 60 }}
-                        appState={this.state.appState}
+                        histories={this.state.histories}
+                        refreshing={this.state.refreshing}
                         onError={(message: string) => this.toast.error(message)}
+                        onRefresh={async () => await this.getData()}
                     />} />
                 </Tab.Navigator>
             </NavigationContainer>
@@ -95,7 +121,19 @@ class App extends React.Component<{}, IAppState> {
             <Toast
                 ref={c => this.toast = c as Toast}
             />
-        </View>;
+        </View> : <AppLoading />;
+    }
+
+    private async getData() {
+        const [budget, histories] = await Promise.all([
+            BudgetApi.get(),
+            BudgetApi.history()
+        ]);
+
+        this.setState({
+            budget,
+            histories
+        });
     }
 }
 

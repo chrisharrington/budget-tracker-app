@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import Modal from 'react-native-modal';
+import { View, Text, StyleSheet, TouchableOpacity, Vibration } from 'react-native';
 import dayjs from 'dayjs';
 
 import { Budget, Transaction } from '../models';
@@ -34,7 +33,7 @@ export default class Transactions extends React.Component<ITransactionsProps, IT
                     transaction={transaction}
                     key={transaction.description + index}
                     onToggle={() => this.onToggle(transaction)}
-                    onLongPress={() => this.setState({ transaction })}
+                    onLongPress={() => this.onTransactionSelected(transaction)}
                 />)}
 
             <TransactionModal
@@ -58,6 +57,11 @@ export default class Transactions extends React.Component<ITransactionsProps, IT
             return first._id.localeCompare(second._id);
 
         return dayjs(first.date).isBefore(second.date) ? 1 : -1
+    }
+
+    private onTransactionSelected(transaction: Transaction) {
+        Vibration.vibrate(10);
+        this.setState({ transaction });
     }
 }
 

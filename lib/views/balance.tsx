@@ -3,10 +3,10 @@ import { StyleSheet, Text, View, ScrollView, RefreshControl, AppState, AppStateS
 
 import CurrencyHelpers from '../helpers/currency';
 
+import BudgetApi from '../data/budget';
+
 import { Budget, Transaction } from '../models';
 import Colours from '../colours';
-
-import BudgetApi from '../data/budget';
 
 import Progress from '../components/progress';
 import Transactions from '../components/transactions';
@@ -14,41 +14,28 @@ import Transactions from '../components/transactions';
 
 interface IBalanceViewProps {
     style?: any;
-    appState: AppStateStatus;
-    onError: (message: string) => void;
-    onTransactionSelected: (transaction: Transaction | null) => void;
-}
-
-interface IBalanceViewstate {
     budget: Budget | null;
     refreshing: boolean;
+    onError: (message: string) => void;
+    onTransactionSelected: (transaction: Transaction | null) => void;
+    onRefresh: () => Promise<void>;
 }
 
-export default class BalanceView extends React.Component<IBalanceViewProps, IBalanceViewstate> {
+export default class BalanceView extends React.Component<IBalanceViewProps> {
     state = {
         budget: null,
-        loading: true,
-        refreshing: false,
-    }
-
-    async componentDidMount() {
-        await this.getBudget();
-    }
-    
-    async componentDidUpdate(prev: IBalanceViewProps) {
-        if (prev.appState.match(/background|inactive/) && this.props.appState === 'active')
-            await this.getBudget();
+        loading: true
     }
 
     render() {
-        const budget = this.state.budget as Budget | null;
+        const budget = this.props.budget as Budget | null;
         if (budget == null)
             return <View style={styles.loading} />;
 
         const amount = budget.weeklyAmount - budget.transactions.filter(b => !b.ignored).map(b => b.amount).reduce((sum, amount) => sum + amount, 0);
         return <ScrollView
             style={[styles.container, this.props.style]}
-            refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={async () => await this.getBudget()}/>}
+            refreshControl={<RefreshControl refreshing={this.props.refreshing} onRefresh={async () => await this.props.onRefresh()}/>}
         >
             <View style={styles.lastWeekContainer}>
                 <Text style={styles.lastWeekText}>Last week's remaining balance:</Text>
@@ -67,17 +54,6 @@ export default class BalanceView extends React.Component<IBalanceViewProps, IBal
                 onError={(message: string) => this.props.onError(message)}
             />
         </ScrollView>;
-    }
-
-    private async getBudget() {
-        try {
-            this.setState({
-                budget: await BudgetApi.get()
-            });
-        } catch (e) {
-            console.log(e);
-            this.props.onError('An error has occurred while retreiving this week\'s budget. Please try again later.');
-        }
     }
 
     private async onTransactionChanged(transaction: Transaction) {
