@@ -3,9 +3,9 @@ export class Id {
 }
 
 export class Budget {
+    date: Date;
     weeklyAmount: number;
     lastWeekRemaining: number;
-    transactions: Transaction[];
     
     constructor(initializer: Partial<Budget>) {
         Object.assign(this, initializer);
@@ -18,9 +18,22 @@ export class Transaction extends Id {
     description: string;
     owner: string;
     ignored: boolean;
+    tags: Tag[];
+
+    constructor() {
+        super();
+        this.tags = [];
+    }
 }
 
 export class History {
     date: Date;
     balance: number;
+}
+
+export class Tag extends Id {
+    name: string;
+    ignore: boolean;
+    defaults: string[];
+    updated: Date
 }

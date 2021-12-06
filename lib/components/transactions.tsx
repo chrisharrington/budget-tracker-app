@@ -2,84 +2,84 @@ import * as React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Vibration } from 'react-native';
 import dayjs from 'dayjs';
 
-import { Budget, Transaction } from '../models';
+import { Tag, Transaction } from '../models';
 import Colours from '../colours';
 
-import TransactionModal from './transaction-modal';
+import TransactionDetailsModal from './transaction-details-modal';
+import TransactionSplitModal from './transaction-split-modal';
 
-interface ITransactionsProps {
-    budget: Budget;
+interface TransactionProps {
+    transactions: Transaction[];
+    tags: Tag[];
     onChange: (transaction: Transaction) => void;
-    onSelect: (transaction: Transaction | null) => void;
     onError: (message: string) => void;
+    onRefresh: () => void;
 }
 
-interface ITransactionsState {
-    transaction: Transaction | null;
+interface TransactionsState {
+    detailsTransaction: Transaction | null;
+    splitTransaction: Transaction | null;
 }
 
-export default class Transactions extends React.Component<ITransactionsProps, ITransactionsState> {
+export default class Transactions extends React.Component<TransactionProps, TransactionsState> {
     state = {
-        transaction: null
+        detailsTransaction: null,
+        splitTransaction: null
     }
 
     render() {
-        const transactions = this.props.budget.transactions;
+        const transactions = this.props.transactions;
         return <View style={styles.container}>
             {!transactions.length && <Text style={styles.noTransactionsText}>No transactions</Text>}
             {(transactions || [])
-                .sort((first: Transaction, second: Transaction) => this.sort(first, second))
-                .map((transaction: Transaction, index: number) => <TransactionView
-                    transaction={transaction}
-                    key={transaction.description + index}
-                    onToggle={() => this.onToggle(transaction)}
-                    onLongPress={() => this.onTransactionSelected(transaction)}
-                />)}
+                .map((transaction: Transaction, index: number) => this.renderTransaction(transaction, index))}
 
-            <TransactionModal
-                transaction={this.state.transaction}
-                onClose={() => this.setState({ transaction: null })}
+            <TransactionDetailsModal
+                transaction={this.state.detailsTransaction}
+                tags={this.props.tags}
+                onClose={() => this.setState({ detailsTransaction: null })}
                 onChange={(transaction: Transaction) => this.props.onChange(transaction)}
+            />
+
+            <TransactionSplitModal
+                transaction={this.state.splitTransaction}
+                onClose={() => this.setState({ splitTransaction: null })}
+                onError={(message: string) => this.props.onError(message)}
+                onSplit={() => this.onTransactionSplit()}
             />
         </View>;
     }
 
-    private onToggle(transaction: Transaction) {
-        transaction.ignored = !transaction.ignored;
-        this.props.onChange(transaction);
-    }
-
-    private sort(first: Transaction, second: Transaction) : number {
-        const firstDate = dayjs(first.date),
-            secondDate = dayjs(second.date);
-
-        if (firstDate.isSame(secondDate))
-            return first._id.localeCompare(second._id);
-
-        return dayjs(first.date).isBefore(second.date) ? 1 : -1
-    }
-
-    private onTransactionSelected(transaction: Transaction) {
-        Vibration.vibrate(10);
-        this.setState({ transaction });
-    }
-}
-
-class TransactionView extends React.Component<{ transaction: Transaction, onToggle: () => void, onLongPress: () => void }> {
-    render() {
-        const transaction = this.props.transaction;
+    private renderTransaction(transaction: Transaction, index: number) {
         return <TouchableOpacity
-            onPress={() => this.props.onToggle()}
-            onLongPress={() => this.props.onLongPress()}
+            onPress={() => this.onPress(transaction)}
+            onLongPress={() => this.onLongPress(transaction)}
             activeOpacity={0.8}
+            key={transaction.description + index}
         >
-            <View style={[styles.transaction, transaction.ignored ? styles.transactionIgnored : null]}>
+            <View style={[styles.transaction, transaction.ignored || transaction.tags.some(t => t.ignore) ? styles.transactionIgnored : null]}>
                 <View style={[styles.transactionOwner, { backgroundColor: transaction.owner === 'Chris' ? Colours.chris : Colours.sarah }]}></View>
-                <Text style={styles.transactionDate}>{dayjs(transaction.date).format('MM/DD')}</Text>
-                <Text style={styles.transactionDescription}>{transaction.description}</Text>
-                <Text style={styles.transactionAmount}>{`$${transaction.amount.toFixed(2)}`}</Text>
+                <View style={styles.transactionDetails}>
+                    <Text style={styles.transactionDate}>{dayjs(transaction.date).format('MM/DD')}</Text>
+                    <Text style={styles.transactionDescription}>{transaction.description}</Text>
+                    <Text style={styles.transactionAmount}>{`$${transaction.amount.toFixed(2)}`}</Text>
+                </View>
             </View>
         </TouchableOpacity>;
+    }
+
+    private onPress(transaction: Transaction) {
+        this.setState({ detailsTransaction: transaction });
+    }
+
+    private onLongPress(transaction: Transaction) {
+        Vibration.vibrate(10);
+        this.setState({ splitTransaction: transaction });
+    }
+
+    private onTransactionSplit() {
+        this.setState({ splitTransaction: null });
+        this.props.onRefresh();
     }
 }
 
@@ -97,7 +97,6 @@ const styles = StyleSheet.create({
         backgroundColor: Colours.background.light,
         borderWidth: 1,
         borderColor: Colours.background.light,
-        flexDirection: 'row',
         position: 'relative',
         overflow: 'hidden',
         borderRadius: 3
@@ -105,6 +104,11 @@ const styles = StyleSheet.create({
 
     transactionIgnored: {
         opacity: 0.3
+    },
+
+    transactionDetails: {
+        flex: 1,
+        flexDirection: 'row'
     },
     
     transactionOwner: {
@@ -136,6 +140,22 @@ const styles = StyleSheet.create({
         fontSize: 12,
         textAlign: 'right',
         fontFamily: 'Lato'
+    },
+
+    tags: {
+        flex: 1,
+        width: '100%',
+        marginTop: 6,
+        borderTopColor: Colours.border.light,
+        paddingTop: 6,
+        flexDirection: 'row',
+        flexWrap: 'wrap'
+    },
+
+    tagsLabel: {
+        flex: 1,
+        color: Colours.text.default,
+        fontSize: 12
     },
 
     noTransactionsText: {

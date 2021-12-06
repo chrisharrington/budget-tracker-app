@@ -104,9 +104,8 @@ export class Toast extends React.Component<{}, IToastState> {
 const styles = StyleSheet.create({
     container: {
         position: 'absolute',
+        width: '100%',
         bottom: 25,
-        paddingLeft: 25,
-        paddingRight: 25,
         transform: [{ translateY: 25 }],
         zIndex: 10000000
     },

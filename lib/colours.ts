@@ -21,7 +21,13 @@ export default class Colours {
 
     static button = {
         negative: Colours.background.dark,
-        positive: '#38A501'
+        positive: '#38A501',
+        positiveDisabled: '#226600'
+    };
+
+    static border = {
+        light: '#555555',
+        dark: Colours.background.dark
     };
 
     static chris: string = '#46D3FF';
