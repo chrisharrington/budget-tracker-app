@@ -25,17 +25,20 @@ interface BalanceViewProps {
 export default (props : BalanceViewProps) => {
     const [budget, setBudget] = useState<Budget | null>();
     const [transactions, setTransactions] = useState<Transaction[]>([]);
-    const [appState, setAppState] = useState<AppStateStatus>(AppState.currentState);
     const [tags, setTags] = useState<Tag[]>([]);
+    const [_, setAppState] = useState<AppStateStatus>(AppState.currentState);
 
     useEffect(() => {
         getBudget();
         getTags();
 
         AppState.addEventListener('change', async (nextState: AppStateStatus) => {
-            if (appState.match(/background|inactive/) && nextState === 'active')
-                await getBudget();
-            setAppState(nextState);
+            setAppState(prevAppState => {
+                if (prevAppState.match(/background|inactive/) && nextState === 'active')
+                    getBudget();
+
+                return AppState.currentState;
+            });
         });
     }, []);
 
