@@ -7,7 +7,7 @@ import Secret from '../secret';
 
 export default class BudgetApi {
     static async get(date: Date) : Promise<{ budget: Budget, transactions: Transaction[] }> {
-        const response = await fetch(`${Config.ApiUrl}/week?date=${dayjs(date).format('YYYY-MM-DD')}`, {
+        const response = await fetch(`${Config.ApiUrl}/week?date=${dayjs.utc(date).format('YYYY-MM-DD')}`, {
             headers: new Headers({
                 'Authorization': Secret.apiKey
             })

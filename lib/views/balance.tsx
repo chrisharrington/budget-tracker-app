@@ -48,7 +48,7 @@ export default (props : BalanceViewProps) => {
     const amount = budget!.weeklyAmount - transactions
         .filter(transaction => !transaction.ignored && transaction.tags.every(tag => !tag.ignore))
         .map(b => b.amount)
-        .reduce((sum, amount) => sum + amount, 0);
+        .reduce((sum, amount) => sum + amount, 0) + budget.lastWeekRemaining;
 
     return <ScrollView
         style={[styles.container, props.style]}

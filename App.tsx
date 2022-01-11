@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, StatusBar as ReactStatusBar, AppStateStatus } from 'react-native';
+import { StyleSheet, View, StatusBar as ReactStatusBar } from 'react-native';
 import AppLoading from 'expo-app-loading';
 import { StatusBar } from 'expo-status-bar';
 import * as Permissions from 'expo-permissions';
