@@ -48,7 +48,9 @@ export default (props : BalanceViewProps) => {
     const amount = budget!.weeklyAmount - transactions
         .filter(transaction => !transaction.ignored && transaction.tags.every(tag => !tag.ignore))
         .map(b => b.amount)
-        .reduce((sum, amount) => sum + amount, 0) + budget.lastWeekRemaining;
+        .reduce((sum, amount) => sum + amount, 0);
+
+    const balance = transactions.find((t: Transaction) => t.balance);
 
     return <ScrollView
         style={[styles.container, props.style]}
@@ -64,13 +66,18 @@ export default (props : BalanceViewProps) => {
             </TouchableOpacity>
         </View>
 
+        {balance && <View style={styles.lastWeekContainer}>
+            <Text style={styles.lastWeekText}>Last week's balance:</Text>
+            <Text style={styles.lastWeekAmount}>{`$${(balance.amount * -1).toFixed(2)}`}</Text>
+        </View>}
+
         <Progress
             budget={budget}
             amount={amount}
         />
 
         <Transactions
-            transactions={transactions}
+            transactions={transactions.filter(t => !t.balance)}
             tags={tags}
             onChange={(transaction: Transaction) => onTransactionChanged(transaction)}
             onError={(message: string) => props.onError(message)}

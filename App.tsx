@@ -34,7 +34,6 @@ interface AppState {
     toastMessage: string;
     toastType: ToastType;
     selectedTransaction: Transaction | null;
-    blah: boolean;
 }
 
 class App extends React.Component<{}, AppState> {
@@ -47,8 +46,7 @@ class App extends React.Component<{}, AppState> {
         histories: [],
         toastMessage: '',
         toastType: ToastType.Success,
-        selectedTransaction: null,
-        blah: false
+        selectedTransaction: null
     }
 
     async componentDidMount() {

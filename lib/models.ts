@@ -18,6 +18,7 @@ export class Transaction extends Id {
     description: string;
     owner: string;
     ignored: boolean;
+    balance: boolean;
     tags: Tag[];
 
     constructor() {

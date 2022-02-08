@@ -52,12 +52,12 @@ export default class Transactions extends React.Component<TransactionProps, Tran
 
     private renderTransaction(transaction: Transaction, index: number) {
         return <TouchableOpacity
-            onPress={() => this.onPress(transaction)}
-            onLongPress={() => this.onLongPress(transaction)}
+            onPress={() => !transaction.balance && this.onPress(transaction)}
+            onLongPress={() => !transaction.balance && this.onLongPress(transaction)}
             activeOpacity={0.8}
             key={transaction.description + index}
         >
-            <View style={[styles.transaction, transaction.ignored || transaction.tags.some(t => t.ignore) ? styles.transactionIgnored : null]}>
+            <View style={[styles.transaction, transaction.ignored || transaction.balance || transaction.tags.some(t => t.ignore) ? styles.transactionIgnored : null]}>
                 <View style={[styles.transactionOwner, { backgroundColor: transaction.owner === 'Chris' ? Colours.chris : Colours.sarah }]}></View>
                 <View style={styles.transactionDetails}>
                     <Text style={styles.transactionDate}>{dayjs(transaction.date).format('MM/DD')}</Text>
