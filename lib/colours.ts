@@ -4,7 +4,8 @@ export default class Colours {
         light: '#404040',
         dark: '#2a2a2a',
         error: '#bd1e18',
-        success: '#35bd18'
+        success: '#35bd18',
+        highlight: '#606060'
     };
 
     static highlight = {

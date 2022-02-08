@@ -66,15 +66,19 @@ export default (props : BalanceViewProps) => {
             </TouchableOpacity>
         </View>
 
-        {balance && <View style={styles.lastWeekContainer}>
-            <Text style={styles.lastWeekText}>Last week's balance:</Text>
-            <Text style={styles.lastWeekAmount}>{`$${(balance.amount * -1).toFixed(2)}`}</Text>
-        </View>}
-
         <Progress
             budget={budget}
             amount={amount}
         />
+
+        {balance && <>
+            <View style={styles.lastWeekContainer}>
+                <Text style={styles.lastWeekText}>Last week's balance:</Text>
+                <Text style={styles.lastWeekAmount}>{`$${(balance.amount * -1).toFixed(2)}`}</Text>
+            </View>
+            
+            <View style={styles.separator}></View>
+        </>}
 
         <Transactions
             transactions={transactions.filter(t => !t.balance)}
@@ -203,5 +207,14 @@ const styles = StyleSheet.create({
         color: Colours.text.default,
         textAlign: 'right',
         fontFamily: 'Lato'
+    },
+
+    separator: {
+        flex: 1,
+        height: 1,
+        backgroundColor: Colours.background.light,
+        marginTop: 20,
+        marginHorizontal: 25,
+        marginBottom: 5
     }
 });

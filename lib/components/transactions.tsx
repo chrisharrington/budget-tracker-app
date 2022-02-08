@@ -87,7 +87,8 @@ export default class Transactions extends React.Component<TransactionProps, Tran
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 25
+        padding: 25,
+        paddingTop: 0
     },
 
     transaction: {
