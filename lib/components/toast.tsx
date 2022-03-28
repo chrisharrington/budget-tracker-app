@@ -107,7 +107,8 @@ const styles = StyleSheet.create({
         width: '100%',
         bottom: 25,
         transform: [{ translateY: 25 }],
-        zIndex: 10000000
+        zIndex: 10000000,
+        paddingHorizontal: 20
     },
 
     wrapper: {

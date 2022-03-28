@@ -1,12 +1,17 @@
 import * as React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Vibration } from 'react-native';
 import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
 
 import { Tag, Transaction } from '../models';
 import Colours from '../colours';
+import Config from '../config';
 
 import TransactionDetailsModal from './transaction-details-modal';
 import TransactionSplitModal from './transaction-split-modal';
+
+dayjs.extend(timezone);
+
 
 interface TransactionProps {
     transactions: Transaction[];
@@ -69,17 +74,28 @@ export default class Transactions extends React.Component<TransactionProps, Tran
     }
 
     private onPress(transaction: Transaction) {
-        this.setState({ detailsTransaction: transaction });
+        if (this.canEdit(transaction))
+            this.setState({ detailsTransaction: transaction });
+        else
+            this.props.onError('Unable to edit transaction because it occurred too long ago.');
     }
 
     private onLongPress(transaction: Transaction) {
-        Vibration.vibrate(10);
-        this.setState({ splitTransaction: transaction });
+        if (this.canEdit(transaction)) {
+            Vibration.vibrate(10);
+            this.setState({ splitTransaction: transaction });
+        } else
+            this.props.onError('Unable to edit transaction because it occurred too long ago.');
     }
 
     private onTransactionSplit() {
         this.setState({ splitTransaction: null });
         this.props.onRefresh();
+    }
+
+    private canEdit(transaction: Transaction) : boolean {
+        const startOfPreviousWeek = dayjs().tz(Config.Timezone).startOf('week').add(1, 'day').subtract(1, 'week');
+        return dayjs(transaction.date).tz(Config.Timezone).isAfter(startOfPreviousWeek);
     }
 }
 

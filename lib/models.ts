@@ -5,7 +5,7 @@ export class Id {
 export class Budget {
     date: Date;
     weeklyAmount: number;
-    lastWeekRemaining: number;
+    balance: number | undefined;
     
     constructor(initializer: Partial<Budget>) {
         Object.assign(this, initializer);

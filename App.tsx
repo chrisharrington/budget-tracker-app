@@ -68,7 +68,7 @@ class App extends React.Component<{}, AppState> {
             />
 
             <BalanceView
-                onError={(message: string) => this.toast.error(message)}
+                onError={(message: string) => this.toast ? this.toast.error(message) : console.error(message)}
             />
 
             <Toast

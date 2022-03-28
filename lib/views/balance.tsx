@@ -50,7 +50,7 @@ export default (props : BalanceViewProps) => {
         .map(b => b.amount)
         .reduce((sum, amount) => sum + amount, 0);
 
-    const balance = transactions.find((t: Transaction) => t.balance);
+    const balance = budget.balance || 0;
 
     return <ScrollView
         style={[styles.container, props.style]}
@@ -68,17 +68,19 @@ export default (props : BalanceViewProps) => {
 
         <Progress
             budget={budget}
-            amount={amount}
+            amount={amount + balance}
         />
 
-        {balance && <>
-            <View style={styles.lastWeekContainer}>
-                <Text style={styles.lastWeekText}>Last week's balance:</Text>
-                <Text style={styles.lastWeekAmount}>{`$${(balance.amount * -1).toFixed(2)}`}</Text>
-            </View>
-            
-            <View style={styles.separator}></View>
-        </>}
+        <View style={styles.lastWeekContainer}>
+            <Text style={styles.lastWeekText}>Last week's balance:</Text>
+            <Text style={styles.lastWeekAmount}>
+                {budget.balance === undefined ?
+                    'Not available' :
+                    (balance < 0 ? '-' : '') + '$' + Math.abs(balance).toFixed(2)}
+            </Text>
+        </View>
+        
+        <View style={styles.separator}></View>
 
         <Transactions
             transactions={transactions.filter(t => !t.balance)}
