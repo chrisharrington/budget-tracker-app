@@ -17,6 +17,7 @@
     "expo-notifications": "^0.13.3",
     "expo-permissions": "^13.0.3",
     "expo-status-bar": "^1.1.0",
+    "expo-updates": "~0.10.15",
     "react": "~16.11.0",
     "react-dom": "~16.11.0",
     "react-gateway": "^3.0.0",

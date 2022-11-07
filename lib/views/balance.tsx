@@ -35,7 +35,7 @@ export default (props : BalanceViewProps) => {
         AppState.addEventListener('change', async (nextState: AppStateStatus) => {
             setAppState(prevAppState => {
                 if (prevAppState.match(/background|inactive/) && nextState === 'active')
-                    getBudget();
+                    getBudget(budget?.date);
 
                 return AppState.currentState;
             });
