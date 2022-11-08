@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { StyleSheet, Text, View, ScrollView, RefreshControl, TouchableOpacity, AppState, AppStateStatus } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import dayjs from 'dayjs';
@@ -27,6 +27,7 @@ export default (props : BalanceViewProps) => {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [tags, setTags] = useState<Tag[]>([]);
     const [_, setAppState] = useState<AppStateStatus>(AppState.currentState);
+    const dateRef = useRef<Date>();
 
     useEffect(() => {
         getBudget();
@@ -35,7 +36,7 @@ export default (props : BalanceViewProps) => {
         AppState.addEventListener('change', async (nextState: AppStateStatus) => {
             setAppState(prevAppState => {
                 if (prevAppState.match(/background|inactive/) && nextState === 'active')
-                    getBudget(budget?.date);
+                    getBudget();
 
                 return AppState.currentState;
             });
@@ -92,10 +93,14 @@ export default (props : BalanceViewProps) => {
     </ScrollView>;
 
     async function getBudget(date?: Date) {
+        if (!date)
+            date = dateRef.current;
+
         try {
             const { transactions, budget } = await BudgetApi.get(date || new Date());
             setBudget(budget);
             setTransactions(transactions.sort((first, second) => dayjs(second.date).valueOf() - dayjs(first.date).valueOf()));
+            dateRef.current = budget.date;
         } catch (e) {
             console.error(e);
             props.onError('An error has occurred while retrieving the budget. Please try again later.');
