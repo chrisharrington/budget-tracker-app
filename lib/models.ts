@@ -38,3 +38,7 @@ export class Tag extends Id {
     defaults: string[];
     updated: Date
 }
+
+export class OneTime extends Id {
+    balance: number;
+}

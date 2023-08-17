@@ -1,80 +1,213 @@
-import React from 'react';
-import { StyleSheet, View, StatusBar as ReactStatusBar } from 'react-native';
-import AppLoading from 'expo-app-loading';
+import React, { useEffect, useRef, useState } from 'react';
+import { StyleSheet, View, StatusBar as ReactStatusBar, ScrollView, RefreshControl, TouchableOpacity, Text, AppState, AppStateStatus } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as Permissions from 'expo-permissions';
 import * as Notifications from 'expo-notifications';
-import { useFonts, Lato_400Regular } from '@expo-google-fonts/lato';
+import * as SplashScreen from 'expo-splash-screen';
+import * as Font from 'expo-font';
+import { Ionicons } from '@expo/vector-icons';
+import dayjs from 'dayjs';
 
 import DeviceApi from './lib/data/device';
-
 import Colours from './lib/colours';
+import { Transaction, Budget, Tag, OneTime } from './lib/models';
+import BudgetApi from './lib/data/budget';
+import TagApi from './lib/data/tag';
+import { Toast, ToastHandle } from './lib/components/toast';
 
-import { Transaction, Budget, History } from './lib/models';
+import Progress from './lib/components/progress';
+import Transactions from './lib/components/transactions';
+import OneTimeApi from './lib/data/one-time';
 
-import { Toast, ToastType } from './lib/components/toast';
-
-import BalanceView from './lib/views/balance';
-
-
-export default () => {
-    const [fontsLoaded] = useFonts({
-        'Lato': Lato_400Regular
-    });
-
-    return fontsLoaded ? <App /> : <AppLoading />;
-}
+SplashScreen.preventAutoHideAsync();
 
 
-interface AppState {
-    ready: boolean;
-    budget: Budget | null;
-    loading: boolean;
-    histories: History[];
-    toastMessage: string;
-    toastType: ToastType;
-    selectedTransaction: Transaction | null;
-}
+export default () => <App />;
 
-class App extends React.Component<{}, AppState> {
-    private toast: Toast;
+const App = () => {
+    const [budget, setBudget] = useState<Budget | null>(),
+        [transactions, setTransactions] = useState<Transaction[]>([]),
+        [tags, setTags] = useState<Tag[]>([]),
+        [oneTime, setOneTime] = useState<OneTime | null>(null),
+        [_, setAppState] = useState<AppStateStatus>(AppState.currentState),
+        dateRef = useRef<Date>(),
+        toast = useRef<ToastHandle>(null);
 
-    state = {
-        ready: false,
-        budget: null,
-        loading: false,
-        histories: [],
-        toastMessage: '',
-        toastType: ToastType.Success,
-        selectedTransaction: null
-    }
-
-    async componentDidMount() {
-        if (!__DEV__) {
-            const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
-            if (status === Permissions.PermissionStatus.GRANTED) {
-                const token = await Notifications.getExpoPushTokenAsync();
-                await DeviceApi.registerToken(token.data);
+    useEffect(() => {
+        (async () => {
+            if (!__DEV__) {
+                const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+                if (status === Permissions.PermissionStatus.GRANTED) {
+                    const token = await Notifications.getExpoPushTokenAsync();
+                    await DeviceApi.registerToken(token.data);
+                }
             }
-        }
 
-        this.setState({ ready: true });
+            await Promise.all([
+                getBudget(),
+                getTags(),
+                getOneTimeBalance(),
+                Font.loadAsync({
+                    'Lato': require('./assets/Lato-Regular.ttf')
+                })
+            ]);
+
+            AppState.addEventListener('change', async (nextState: AppStateStatus) => {
+                setAppState(prevAppState => {
+                    if (prevAppState.match(/background|inactive/) && nextState === 'active')
+                        getBudget();
+
+                    return AppState.currentState;
+                });
+            });
+
+            await SplashScreen.hideAsync();
+        })();
+    }, []);
+
+    if (budget == null)
+        return <View style={styles.loading} />;
+
+    const amount = budget!.weeklyAmount - transactions
+        .filter(transaction => !transaction.ignored && transaction.tags.every(tag => !tag.ignore))
+        .map(b => b.amount)
+        .reduce((sum, amount) => sum + amount, 0);
+
+    const balance = budget.balance || 0;
+
+    return <View style={styles.container}>
+        <StatusBar
+            style='light'
+        />
+
+        <ScrollView
+            style={styles.scrollContainer}
+            refreshControl={<RefreshControl refreshing={false} onRefresh={() => onRefresh()}/>}
+        >
+            <View style={styles.additionalDataContainer}>
+                <Text style={styles.additionalDataText}>One-time balance:</Text>
+                <Text style={styles.additionalDataValue}>
+                    {oneTime?.balance === undefined ?
+                        'Not available' :
+                        ('$' + Math.abs(oneTime.balance).toFixed(2))}
+                </Text>
+            </View>
+
+            <View style={styles.separator}></View>
+
+            <View style={styles.dateMenu}>
+                <TouchableOpacity style={styles.previousDateButton} onPress={async () => await onPreviousWeek()}>
+                    <Ionicons name='caret-back-outline' size={20} color={Colours.text.default} style={{ marginTop: 6, marginLeft: 10 }} />
+                </TouchableOpacity>
+                <Text style={styles.currentDate}>{dayjs(budget.date).format('MM/DD/YYYY')}</Text>
+                <TouchableOpacity style={styles.nextDateButton} onPress={async () => await onNextWeek()}>
+                    <Ionicons name='caret-forward-outline' size={20} color={Colours.text.default} style={{ textAlign: 'right', marginTop: 6, marginRight: 10 }}  />
+                </TouchableOpacity>
+            </View>
+
+            <Progress
+                budget={budget}
+                amount={amount + balance}
+            />
+
+            <View style={styles.additionalDataContainer}>
+                <Text style={styles.additionalDataText}>Last week's balance:</Text>
+                <Text style={styles.additionalDataValue}>
+                    {budget.balance === undefined ?
+                        'Not available' :
+                        (balance < 0 ? '-' : '') + '$' + Math.abs(balance).toFixed(2)}
+                </Text>
+            </View>
+            
+            <View style={styles.separator}></View>
+
+            <Transactions
+                transactions={transactions.filter(t => !t.balance)}
+                tags={tags}
+                onChange={(transaction: Transaction) => onTransactionChanged(transaction)}
+                onError={(message: string) => error(message)}
+                onRefresh={() => getBudget(budget.date)}
+            />
+        </ScrollView>
+
+        <Toast ref={toast} />
+    </View>;
+
+    async function getBudget(date?: Date) {
+        if (!date)
+            date = dateRef.current;
+
+        try {
+            const { transactions, budget } = await BudgetApi.get(dayjs(date).add(1, 'day').startOf('day').toDate() || new Date());
+            setBudget(budget);
+            setTransactions(transactions.sort((first, second) => dayjs(second.date).valueOf() - dayjs(first.date).valueOf()));
+            dateRef.current = budget.date;
+        } catch (e) {
+            error('An error has occurred while retrieving the budget. Please try again later.', e);
+        }
     }
 
-    render() {
-        return this.state.ready ? <View style={styles.container}>
-            <StatusBar
-                style='light'
-            />
+    async function getTags() {
+        try {
+            const tags = await TagApi.get();
+            setTags(tags);
+        } catch (e) {
+            error('An error has occurred while retrieving the list of tags. Please try again later.', e);
+        }
+    }
 
-            <BalanceView
-                onError={(message: string) => this.toast ? this.toast.error(message) : console.error(message)}
-            />
+    async function getOneTimeBalance() {
+        try {
+            const oneTime = await OneTimeApi.get();
+            setOneTime(oneTime);
+        } catch (e) {
+            error('An error has occurred while retrieving the one-time balance. Please try again later.', e);
+        }
+    }
 
-            <Toast
-                ref={c => this.toast = c as Toast}
-            />
-        </View> : <AppLoading />;
+    async function onPreviousWeek() {
+        if (!budget)
+            return;
+
+        await getBudget(dayjs(budget.date).subtract(1, 'week').toDate());
+    }
+
+    async function onNextWeek() {
+        if (!budget)
+            return;
+
+        const date = dayjs(budget.date).add(1, 'week');
+        if (date.isAfter(dayjs()))
+            return;
+
+        await getBudget(date.toDate());
+    }
+
+    async function onRefresh() {
+        await getBudget(budget?.date);
+    }
+
+    async function onTransactionChanged(changed: Transaction) {
+        try {
+            setTransactions([...transactions
+                .filter(t => t._id !== changed._id), changed]
+                .sort((first, second) => dayjs(second.date).valueOf() - dayjs(first.date).valueOf()));
+            await BudgetApi.updateTransaction(changed);
+            await getOneTimeBalance();
+        } catch (e) {
+            error('An error has occurred while updating the transaction. Please try again later.', e);
+            setBudget(budget);
+        }
+    }
+
+    function error(message: string, error?: any) {
+        if (!toast.current)
+            return;
+
+        toast.current.error(message);
+
+        if (error)
+            console.error(error);
     }
 }
 
@@ -121,5 +254,76 @@ const styles = StyleSheet.create({
     tabButtonTextSelected: {
         borderBottomWidth: 2,
         borderBottomColor: Colours.highlight.default
+    },
+
+    scrollContainer: {
+        backgroundColor: Colours.background.default
+    },
+
+    loading: {
+        backgroundColor: Colours.background.default,
+        flex: 1
+    },
+
+    dateMenu: {
+        flex: 1,
+        marginTop: 25,
+        paddingLeft: 15,
+        paddingRight: 15,
+        flexDirection: 'row'
+    },
+    
+    previousDateButton: {
+        width: 50,
+        textAlign: 'left',
+        color: Colours.text.default,
+        height: 34
+    },
+    
+    currentDate: {
+        flexGrow: 1,
+        textAlign: 'center',
+        color: Colours.text.default,
+        fontFamily: 'Lato',
+        fontSize: 28
+    },
+    
+    nextDateButton: {
+        width: 50,
+        textAlign: 'right',
+        color: Colours.text.default,
+        height: 34,
+    },
+
+    additionalDataContainer: {
+        width: '100%',
+        marginTop: 25,
+        paddingLeft: 25,
+        paddingRight: 25,
+        flexDirection: 'row'
+    },
+
+    additionalDataText: {
+        flex: 3,
+        fontSize: 12,
+        color: Colours.text.lowlight,
+        fontFamily: 'Lato'
+    },
+
+    additionalDataValue: {
+        flex: 1,
+        fontSize: 12,
+        color: Colours.text.default,
+        textAlign: 'right',
+        fontFamily: 'Lato'
+    },
+
+    separator: {
+        flex: 1,
+        height: 1,
+        backgroundColor: Colours.background.light,
+        marginTop: 20,
+        marginHorizontal: 25,
+        marginBottom: 5
     }
 });

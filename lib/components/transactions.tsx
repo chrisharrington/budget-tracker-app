@@ -94,8 +94,8 @@ export default class Transactions extends React.Component<TransactionProps, Tran
     }
 
     private canEdit(transaction: Transaction) : boolean {
-        const startOfPreviousWeek = dayjs().tz(Config.Timezone).startOf('week').add(1, 'day').subtract(1, 'week');
-        return dayjs(transaction.date).tz(Config.Timezone).isAfter(startOfPreviousWeek);
+        const startOfPreviousWeek = dayjs().startOf('week').add(1, 'day').subtract(1, 'week');
+        return dayjs(transaction.date).isAfter(startOfPreviousWeek);
     }
 }
 

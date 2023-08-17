@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useImperativeHandle, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Animated, Easing } from 'react-native';
 
 import Colours from '../colours';
@@ -8,67 +9,65 @@ export enum ToastType {
     Success
 }
 
-interface IToastState {
-    message: string;
-    type: ToastType;
-    opacity: Animated.Value;
-    position: Animated.Value;
+export interface ToastHandle {
+    clear: () => void;
+    error: (message: string) => void;
+    success: (message: string) => void;
 }
 
-export class Toast extends React.Component<{}, IToastState> {
-    private timeout: any;
+export const Toast = React.forwardRef<ToastHandle>((_, ref) => {
+    const [opacity, setOpacity] = useState<Animated.Value>(new Animated.Value(0)),
+        [position, setPosition] = useState<Animated.Value>(new Animated.Value(25)),
+        [message, setMessage] = useState<string>(''),
+        [type, setType] = useState<ToastType>(ToastType.Success),
+        timeout = useRef<any>();
 
-    state = {
-        message: '',
-        type: ToastType.Success,
-        opacity: new Animated.Value(0),
-        position: new Animated.Value(25)
+    useImperativeHandle(ref, () => ({ clear, error, success }));
+
+    return <Animated.View style={[
+        styles.container,
+        { opacity, transform: [{ translateY: position }] }
+    ]}>
+        <View style={[styles.wrapper, { backgroundColor: getBackgroundColour(type) }]}>
+            <Text style={styles.text}>{message}</Text>
+        </View>
+    </Animated.View>;
+
+    async function clear() : Promise<void> {
+        await toggle(false);
+        setMessage('');
     }
 
-    render() {
-        return <Animated.View style={[
-            styles.container,
-            { opacity: this.state.opacity, transform: [{ translateY: this.state.position }] }
-        ]}>
-            <View style={[styles.wrapper, { backgroundColor: this.getBackgroundColour(this.state.type) }]}>
-                <Text style={styles.text}>{this.state.message}</Text>
-            </View>
-        </Animated.View>;
+    async function error(message: string) : Promise<void> {
+        await messageInternal(message, ToastType.Error);
     }
 
-    async clear() : Promise<void> {
-        await this.toggle(false);
-        this.setState({ message: '' });
+    async function success(message: string) : Promise<void> {
+        await messageInternal(message, ToastType.Success);
     }
 
-    async error(message: string) : Promise<void> {
-        await this.message(message, ToastType.Error);
-    }
-
-    async success(message: string) : Promise<void> {
-        await this.message(message, ToastType.Success);
-    }
-
-    private async message(message: string, type: ToastType) : Promise<void> {
-        const previous = this.state.message,
-            current = message;
+    async function messageInternal(newMessage: string, type: ToastType) : Promise<void> {
+        const previous = message,
+            current = newMessage;
 
         if (!previous && current) {
-            this.setState({ message: current, type });
-            await this.toggle(true);
+            setMessage(current);
+            setType(type);
+            await toggle(true);
         } else if (previous && current) {
-            await this.toggle(false);
-            this.setState({ message: current, type });
-            await this.toggle(true);
+            await toggle(false);
+            setMessage(current);
+            setType(type);
+            await toggle(true);
         }
 
-        if (this.timeout)
-            clearTimeout(this.timeout);
+        if (timeout.current)
+            clearTimeout(timeout.current);
 
-        this.timeout = setTimeout(() => this.clear(), 5000);
+        timeout.current = setTimeout(() => clear(), 5000);
     }
 
-    private getBackgroundColour(type: ToastType) : string {
+    function getBackgroundColour(type: ToastType) : string {
         switch (type) {
             case ToastType.Error:
                 return Colours.background.error;
@@ -79,16 +78,16 @@ export class Toast extends React.Component<{}, IToastState> {
         }
     }
 
-    private async toggle(visible: boolean) : Promise<void> {
+    async function toggle(visible: boolean) : Promise<void> {
         return new Promise<void>(resolve => {
-            Animated.timing(this.state.opacity, {
+            Animated.timing(opacity, {
                 toValue: visible ? 1 : 0,
                 duration: 150,
                 useNativeDriver: true,
                 easing: Easing.linear
             }).start();
 
-            Animated.timing(this.state.position, {
+            Animated.timing(position, {
                 toValue: visible ? 0 : 25,
                 duration: 150,
                 useNativeDriver: true,
@@ -98,7 +97,7 @@ export class Toast extends React.Component<{}, IToastState> {
             setTimeout(() => resolve(), 200);
         });
     }
-}
+});
 
 
 const styles = StyleSheet.create({
