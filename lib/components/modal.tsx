@@ -6,13 +6,13 @@ import dayjs from 'dayjs';
 import { Tag, Transaction } from '../models';
 import Colours from '../colours';
 
-interface ModalProps {
+type ModalProps = {
     visible: boolean;
     onClose: () => void;
     onSave: () => void;
     saveButtonText?: string;
     saveButtonDisabled?: boolean;
-}
+} & React.PropsWithChildren;
 
 export default class Modal extends React.Component<ModalProps> {
     render() {

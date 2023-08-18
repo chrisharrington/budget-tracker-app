@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View, StatusBar as ReactStatusBar, ScrollView, RefreshControl, TouchableOpacity, Text, AppState, AppStateStatus } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import * as Permissions from 'expo-permissions';
 import * as Notifications from 'expo-notifications';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
 import dayjs from 'dayjs';
+import Constants from 'expo-constants';
 
 import DeviceApi from './lib/data/device';
 import Colours from './lib/colours';
@@ -36,11 +36,21 @@ const App = () => {
     useEffect(() => {
         (async () => {
             if (!__DEV__) {
-                const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
-                if (status === Permissions.PermissionStatus.GRANTED) {
-                    const token = await Notifications.getExpoPushTokenAsync();
+                let { granted } = await Notifications.getPermissionsAsync();
+                console.log(`granted: ${granted}`);
+                if (!granted)
+                    granted = (await Notifications.requestPermissionsAsync()).granted;
+
+                console.log(`granted 2: ${granted}`);
+                if (granted) {
+                    console.log(`projectId: ${Constants.expoConfig?.extra?.eas.projectId}`);
+                    const token = await Notifications.getExpoPushTokenAsync({
+                        projectId: Constants.expoConfig?.extra?.eas.projectId
+                    });
+                    console.log(`token: ${JSON.stringify(token)}`);
                     await DeviceApi.registerToken(token.data);
-                }
+                } else
+                    console.error('Notifications permission not granted.');
             }
 
             await Promise.all([
