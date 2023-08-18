@@ -24,7 +24,6 @@
     "android": {
       "package": "com.budgettracker.app",
       "versionCode": 1,
-      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon-foreground.png",
         "backgroundColor": "#059C6B"
@@ -35,8 +34,13 @@
       "backgroundColor": "#333333"
     },
     "notification": {
-        "icon": "./assets/status-bar-icon.png",
-        "color": "#D5B80C"
+      "icon": "./assets/status-bar-icon.png",
+      "color": "#D5B80C"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "160e6714-0a9e-4efa-9f13-cbde6800ec70"
+      }
     }
   }
 }

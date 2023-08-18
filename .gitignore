@@ -104,5 +104,5 @@ dist
 .tern-port
 
 # Secret files should not be checked in
-secret.ts
+.env
 google-services.json

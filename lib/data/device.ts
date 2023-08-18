@@ -1,5 +1,4 @@
 import Config from '../config';
-import Secret from '../secret';
 
 export default class DeviceApi {
     static async registerToken(token: string) : Promise<void> {
@@ -7,7 +6,7 @@ export default class DeviceApi {
             method: 'POST',
             body: JSON.stringify({ token }),
             headers: new Headers({
-                'Authorization': Secret.apiKey,
+                'Authorization': process.env.EXPO_PUBLIC_API_KEY as string,
                 'Content-Type': 'application/json'
             })
         });
