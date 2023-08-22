@@ -30,24 +30,20 @@ const App = () => {
         [tags, setTags] = useState<Tag[]>([]),
         [oneTime, setOneTime] = useState<OneTime | null>(null),
         [_, setAppState] = useState<AppStateStatus>(AppState.currentState),
-        dateRef = useRef<Date>(),
+        dateRef = useRef<Date>(dayjs().toDate()),
         toast = useRef<ToastHandle>(null);
 
     useEffect(() => {
         (async () => {
             if (!__DEV__) {
                 let { granted } = await Notifications.getPermissionsAsync();
-                console.log(`granted: ${granted}`);
                 if (!granted)
                     granted = (await Notifications.requestPermissionsAsync()).granted;
 
-                console.log(`granted 2: ${granted}`);
                 if (granted) {
-                    console.log(`projectId: ${Constants.expoConfig?.extra?.eas.projectId}`);
                     const token = await Notifications.getExpoPushTokenAsync({
                         projectId: Constants.expoConfig?.extra?.eas.projectId
                     });
-                    console.log(`token: ${JSON.stringify(token)}`);
                     await DeviceApi.registerToken(token.data);
                 } else
                     console.error('Notifications permission not granted.');
@@ -148,7 +144,7 @@ const App = () => {
             date = dateRef.current;
 
         try {
-            const { transactions, budget } = await BudgetApi.get(dayjs(date).add(1, 'day').startOf('day').toDate() || new Date());
+            const { transactions, budget } = await BudgetApi.get(date);
             setBudget(budget);
             setTransactions(transactions.sort((first, second) => dayjs(second.date).valueOf() - dayjs(first.date).valueOf()));
             dateRef.current = budget.date;
