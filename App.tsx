@@ -29,47 +29,61 @@ const App = () => {
         [transactions, setTransactions] = useState<Transaction[]>([]),
         [tags, setTags] = useState<Tag[]>([]),
         [oneTime, setOneTime] = useState<OneTime | null>(null),
+        [error, setError] = useState<Error | null>(null),
         [_, setAppState] = useState<AppStateStatus>(AppState.currentState),
+
         dateRef = useRef<Date>(dayjs().toDate()),
         toast = useRef<ToastHandle>(null);
 
     useEffect(() => {
         (async () => {
-            if (!__DEV__) {
-                let { granted } = await Notifications.getPermissionsAsync();
-                if (!granted)
-                    granted = (await Notifications.requestPermissionsAsync()).granted;
+            try {
+                if (!__DEV__) {
+                    let { granted } = await Notifications.getPermissionsAsync();
+                    if (!granted)
+                        granted = (await Notifications.requestPermissionsAsync()).granted;
 
-                if (granted) {
-                    const token = await Notifications.getExpoPushTokenAsync({
-                        projectId: Constants.expoConfig?.extra?.eas.projectId
+                    if (granted) {
+                        const token = await Notifications.getExpoPushTokenAsync({
+                            projectId: Constants.expoConfig?.extra?.eas.projectId
+                        });
+                        await DeviceApi.registerToken(token.data);
+                    } else
+                        console.error('Notifications permission not granted.');
+                }
+
+                await Promise.all([
+                    getBudget(),
+                    getTags(),
+                    getOneTimeBalance(),
+                    Font.loadAsync({
+                        'Lato': require('./assets/Lato-Regular.ttf')
+                    })
+                ]);
+
+                AppState.addEventListener('change', async (nextState: AppStateStatus) => {
+                    setAppState(prevAppState => {
+                        if (prevAppState.match(/background|inactive/) && nextState === 'active')
+                            getBudget();
+
+                        return AppState.currentState;
                     });
-                    await DeviceApi.registerToken(token.data);
-                } else
-                    console.error('Notifications permission not granted.');
-            }
-
-            await Promise.all([
-                getBudget(),
-                getTags(),
-                getOneTimeBalance(),
-                Font.loadAsync({
-                    'Lato': require('./assets/Lato-Regular.ttf')
-                })
-            ]);
-
-            AppState.addEventListener('change', async (nextState: AppStateStatus) => {
-                setAppState(prevAppState => {
-                    if (prevAppState.match(/background|inactive/) && nextState === 'active')
-                        getBudget();
-
-                    return AppState.currentState;
                 });
-            });
 
-            await SplashScreen.hideAsync();
+            } catch (e) {
+                setError(e as Error);
+            } finally {
+                await SplashScreen.hideAsync();
+            }
         })();
     }, []);
+
+    if (error)
+        return <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>
+                {error.stack}
+            </Text>
+        </View>;
 
     if (budget == null)
         return <View style={styles.loading} />;
@@ -90,50 +104,50 @@ const App = () => {
             style={styles.scrollContainer}
             refreshControl={<RefreshControl refreshing={false} onRefresh={() => onRefresh()}/>}
         >
-            <View style={styles.additionalDataContainer}>
-                <Text style={styles.additionalDataText}>One-time balance:</Text>
-                <Text style={styles.additionalDataValue}>
-                    {oneTime?.balance === undefined ?
-                        'Not available' :
-                        ('$' + Math.abs(oneTime.balance).toFixed(2))}
-                </Text>
-            </View>
+                <View style={styles.additionalDataContainer}>
+                    <Text style={styles.additionalDataText}>One-time balance:</Text>
+                    <Text style={styles.additionalDataValue}>
+                        {oneTime?.balance === undefined ?
+                            'Not available' :
+                            ('$' + Math.abs(oneTime.balance).toFixed(2))}
+                    </Text>
+                </View>
 
-            <View style={styles.separator}></View>
+                <View style={styles.separator}></View>
 
-            <View style={styles.dateMenu}>
-                <TouchableOpacity style={styles.previousDateButton} onPress={async () => await onPreviousWeek()}>
-                    <Ionicons name='caret-back-outline' size={20} color={Colours.text.default} style={{ marginTop: 6, marginLeft: 10 }} />
-                </TouchableOpacity>
-                <Text style={styles.currentDate}>{dayjs(budget.date).format('MM/DD/YYYY')}</Text>
-                <TouchableOpacity style={styles.nextDateButton} onPress={async () => await onNextWeek()}>
-                    <Ionicons name='caret-forward-outline' size={20} color={Colours.text.default} style={{ textAlign: 'right', marginTop: 6, marginRight: 10 }}  />
-                </TouchableOpacity>
-            </View>
+                <View style={styles.dateMenu}>
+                    <TouchableOpacity style={styles.previousDateButton} onPress={async () => await onPreviousWeek()}>
+                        <Ionicons name='caret-back-outline' size={20} color={Colours.text.default} style={{ marginTop: 6, marginLeft: 10 }} />
+                    </TouchableOpacity>
+                    <Text style={styles.currentDate}>{dayjs(budget.date).format('MM/DD/YYYY')}</Text>
+                    <TouchableOpacity style={styles.nextDateButton} onPress={async () => await onNextWeek()}>
+                        <Ionicons name='caret-forward-outline' size={20} color={Colours.text.default} style={{ textAlign: 'right', marginTop: 6, marginRight: 10 }}  />
+                    </TouchableOpacity>
+                </View>
 
-            <Progress
-                budget={budget}
-                amount={amount + balance}
-            />
+                <Progress
+                    budget={budget}
+                    amount={amount + balance}
+                />
 
-            <View style={styles.additionalDataContainer}>
-                <Text style={styles.additionalDataText}>Last week's balance:</Text>
-                <Text style={styles.additionalDataValue}>
-                    {budget.balance === undefined ?
-                        'Not available' :
-                        (balance < 0 ? '-' : '') + '$' + Math.abs(balance).toFixed(2)}
-                </Text>
-            </View>
-            
-            <View style={styles.separator}></View>
+                <View style={styles.additionalDataContainer}>
+                    <Text style={styles.additionalDataText}>Last week's balance:</Text>
+                    <Text style={styles.additionalDataValue}>
+                        {budget.balance === undefined ?
+                            'Not available' :
+                            (balance < 0 ? '-' : '') + '$' + Math.abs(balance).toFixed(2)}
+                    </Text>
+                </View>
+                
+                <View style={styles.separator}></View>
 
-            <Transactions
-                transactions={transactions.filter(t => !t.balance)}
-                tags={tags}
-                onChange={(transaction: Transaction) => onTransactionChanged(transaction)}
-                onError={(message: string) => error(message)}
-                onRefresh={() => getBudget(budget.date)}
-            />
+                <Transactions
+                    transactions={transactions.filter(t => !t.balance)}
+                    tags={tags}
+                    onChange={(transaction: Transaction) => onTransactionChanged(transaction)}
+                    onError={(message: string) => showError(message)}
+                    onRefresh={() => getBudget(budget.date)}
+                />
         </ScrollView>
 
         <Toast ref={toast} />
@@ -149,7 +163,7 @@ const App = () => {
             setTransactions(transactions.sort((first, second) => dayjs(second.date).valueOf() - dayjs(first.date).valueOf()));
             dateRef.current = budget.date;
         } catch (e) {
-            error('An error has occurred while retrieving the budget. Please try again later.', e);
+            showError('An error has occurred while retrieving the budget. Please try again later.', e);
         }
     }
 
@@ -158,7 +172,7 @@ const App = () => {
             const tags = await TagApi.get();
             setTags(tags);
         } catch (e) {
-            error('An error has occurred while retrieving the list of tags. Please try again later.', e);
+            showError('An error has occurred while retrieving the list of tags. Please try again later.', e);
         }
     }
 
@@ -167,7 +181,7 @@ const App = () => {
             const oneTime = await OneTimeApi.get();
             setOneTime(oneTime);
         } catch (e) {
-            error('An error has occurred while retrieving the one-time balance. Please try again later.', e);
+            showError('An error has occurred while retrieving the one-time balance. Please try again later.', e);
         }
     }
 
@@ -201,12 +215,12 @@ const App = () => {
             await BudgetApi.updateTransaction(changed);
             await getOneTimeBalance();
         } catch (e) {
-            error('An error has occurred while updating the transaction. Please try again later.', e);
+            showError('An error has occurred while updating the transaction. Please try again later.', e);
             setBudget(budget);
         }
     }
 
-    function error(message: string, error?: any) {
+    function showError(message: string, error?: any) {
         if (!toast.current)
             return;
 
@@ -331,5 +345,17 @@ const styles = StyleSheet.create({
         marginTop: 20,
         marginHorizontal: 25,
         marginBottom: 5
+    },
+
+    errorContainer: {
+        flex: 1,
+        backgroundColor: Colours.background.error,
+        borderRadius: 5,
+        padding: 15,
+        paddingTop: 15 + (ReactStatusBar.currentHeight || 0)
+    },
+
+    errorText: {
+        color: Colours.text.default
     }
 });

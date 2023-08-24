@@ -1,16 +1,17 @@
 import dayjs from 'dayjs';
 import { Budget, Transaction, History } from '../models';
 import Config from '../config';
+import Secret from '../secret';
 
 export default class BudgetApi {
     static async get(date: Date) : Promise<{ budget: Budget, transactions: Transaction[] }> {
         const response = await fetch(`${Config.ApiUrl}/week?date=${dayjs(date).format()}`, {
             headers: new Headers({
-                'Authorization': process.env.EXPO_PUBLIC_API_KEY as string
+                'Authorization': Secret.apiKey as string
             })
         });
 
-        if (response.status !== 200)
+        if (!response.ok)
             throw new Error(`Error while retreiving budget. ${response.status}`);
 
         const result = await response.json();
@@ -22,11 +23,11 @@ export default class BudgetApi {
     static async history() : Promise<History[]> {
         const response = await fetch(`${Config.ApiUrl}/history`, {
             headers: new Headers({
-                'Authorization': process.env.EXPO_PUBLIC_API_KEY as string
+                'Authorization': Secret.apiKey as string
             })
         });
 
-        if (response.status !== 200)
+        if (!response.ok)
             throw new Error(`Error while retrieving history. ${response.status}`);
 
         return await response.json();
@@ -37,12 +38,12 @@ export default class BudgetApi {
             method: 'POST',
             body: JSON.stringify(transaction),
             headers: new Headers({
-                'Authorization': process.env.EXPO_PUBLIC_API_KEY as string,
+                'Authorization': Secret.apiKey as string,
                 'Content-Type': 'application/json'
             })
         });
 
-        if (response.status !== 200)
+        if (!response.ok)
             throw new Error(`Error while updating transaction. ${response.status}`);
     }
 
@@ -54,12 +55,12 @@ export default class BudgetApi {
                 newAmount
             }),
             headers: new Headers({
-                'Authorization': process.env.EXPO_PUBLIC_API_KEY as string,
+                'Authorization': Secret.apiKey as string,
                 'Content-Type': 'application/json'
             })
         });
 
-        if (response.status !== 200)
+        if (!response.ok)
             throw new Error(`Error while splitting transaction. ${response.status}`);
     }
 }
