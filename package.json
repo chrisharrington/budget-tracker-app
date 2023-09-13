@@ -7,8 +7,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "build": "npx eas build -p android --profile production --clear-cache",
-    "build:local": "npx eas build --platform android --local --clear-cache",
+    "build": "eas build -p android --profile production --clear-cache",
+    "build:local": "eas build --platform android --local --clear-cache",
     "log": "npx react-native log-android"
   },
   "dependencies": {

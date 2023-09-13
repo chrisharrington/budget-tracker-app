@@ -109,7 +109,7 @@ const App = () => {
                     <Text style={styles.additionalDataValue}>
                         {oneTime?.balance === undefined ?
                             'Not available' :
-                            ('$' + Math.abs(oneTime.balance).toFixed(2))}
+                            (`${oneTime.balance < 0 ? '-' : ''}$` + Math.abs(oneTime.balance).toFixed(2))}
                     </Text>
                 </View>
 
