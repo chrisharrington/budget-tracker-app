@@ -1,13 +1,13 @@
 import dayjs from 'dayjs';
+import { EXPO_PUBLIC_API_KEY } from '@env';
 import { Budget, Transaction, History } from '../models';
 import Config from '../config';
-import Secret from '../secret';
 
 export default class BudgetApi {
     static async get(date: Date) : Promise<{ budget: Budget, transactions: Transaction[] }> {
         const response = await fetch(`${Config.ApiUrl}/week?date=${dayjs(date).format()}`, {
             headers: new Headers({
-                'Authorization': Secret.apiKey as string
+                'Authorization': EXPO_PUBLIC_API_KEY
             })
         });
 
@@ -23,7 +23,7 @@ export default class BudgetApi {
     static async history() : Promise<History[]> {
         const response = await fetch(`${Config.ApiUrl}/history`, {
             headers: new Headers({
-                'Authorization': Secret.apiKey as string
+                'Authorization': EXPO_PUBLIC_API_KEY
             })
         });
 
@@ -38,7 +38,7 @@ export default class BudgetApi {
             method: 'POST',
             body: JSON.stringify(transaction),
             headers: new Headers({
-                'Authorization': Secret.apiKey as string,
+                'Authorization': EXPO_PUBLIC_API_KEY,
                 'Content-Type': 'application/json'
             })
         });
@@ -55,7 +55,7 @@ export default class BudgetApi {
                 newAmount
             }),
             headers: new Headers({
-                'Authorization': Secret.apiKey as string,
+                'Authorization': EXPO_PUBLIC_API_KEY,
                 'Content-Type': 'application/json'
             })
         });

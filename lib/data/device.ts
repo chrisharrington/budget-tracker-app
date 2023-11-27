@@ -1,5 +1,5 @@
+import { EXPO_PUBLIC_API_KEY } from '@env';
 import Config from '../config';
-import Secret from '../secret';
 
 export default class DeviceApi {
     static async registerToken(token: string) : Promise<void> {
@@ -7,7 +7,7 @@ export default class DeviceApi {
             method: 'POST',
             body: JSON.stringify({ token }),
             headers: new Headers({
-                'Authorization': Secret.apiKey as string,
+                'Authorization': EXPO_PUBLIC_API_KEY,
                 'Content-Type': 'application/json'
             })
         });

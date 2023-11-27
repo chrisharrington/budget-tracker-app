@@ -1,12 +1,12 @@
+import { EXPO_PUBLIC_API_KEY } from '@env';
 import { Tag } from '../models';
 import Config from '../config';
-import Secret from '../secret';
 
 export default class TagApi {
     static async get() : Promise<Tag[]> {
         const response = await fetch(`${Config.ApiUrl}/tags/recent`, {
             headers: new Headers({
-                'Authorization': Secret.apiKey as string
+                'Authorization': EXPO_PUBLIC_API_KEY
             })
         });
 

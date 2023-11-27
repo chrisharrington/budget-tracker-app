@@ -102,6 +102,3 @@ dist
 
 # TernJS port file
 .tern-port
-
-# Secret files should not be checked in
-secret.ts
