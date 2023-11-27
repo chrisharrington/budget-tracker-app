@@ -6,17 +6,20 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "bun": "1.0.12"
+      "bun": "1.0.12",
+      "channel": "development"
     },
     "preview": {
       "distribution": "internal",
-      "bun": "1.0.12"
+      "bun": "1.0.12",
+      "channel": "preview"
     },
     "production": {
       "android": {
         "buildType": "apk"
       },
-      "bun": "1.0.12"
+      "bun": "1.0.12",
+      "channel": "production"
     }
   },
   "submit": {
