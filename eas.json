@@ -5,15 +5,18 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "bun": "1.0.12"
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "bun": "1.0.12"
     },
     "production": {
       "android": {
         "buildType": "apk"
-      }
+      },
+      "bun": "1.0.12"
     }
   },
   "submit": {
