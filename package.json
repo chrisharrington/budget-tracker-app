@@ -28,7 +28,8 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
-    "@types/react": "^18.2.20"
+    "@types/react": "^18.2.20",
+    "react-native-dotenv": "^3.4.9"
   },
   "private": true
 }
