@@ -11,6 +11,7 @@ import Colours from './lib/colours';
 import { Toast, ToastHandle } from './lib/components/toast';
 import { TransactionsScreen } from '@lib/screens/transactions';
 import { StateContext } from '@lib/context';
+import { AllowancesScreen } from '@lib/screens/allowances';
 
 LogBox.ignoreLogs(['new NativeEventEmitter()']);
 
@@ -51,11 +52,11 @@ export default () => {
         })();
     }, []);
 
-    return <NavigationContainer>
-        <View style={styles.container}>
-            <Toast ref={toast} />
+    return <View style={styles.container}>
+        <Toast ref={toast} />
 
-            <StateContext.Provider value={{ toast: toast.current as ToastHandle }}>
+        <StateContext.Provider value={{ toast: toast.current as ToastHandle }}>
+            <NavigationContainer>
                 <Tab.Navigator
                     initialRouteName='Transactions'
                     screenOptions={{
@@ -71,10 +72,18 @@ export default () => {
                             tabBarIcon: ({ size }) => <Ionicons name='list' color={Colours.text.default} size={size} />
                         }}
                     />
+
+                    <Tab.Screen
+                        name='Allowances'
+                        component={AllowancesScreen}
+                        options={{
+                            tabBarIcon: ({ size }) => <Ionicons name='people' color={Colours.text.default} size={size} />
+                        }}
+                    />
                 </Tab.Navigator>
-            </StateContext.Provider>
-        </View>
-    </NavigationContainer>;
+            </NavigationContainer>
+        </StateContext.Provider>
+    </View>;
 }
 
 const styles = StyleSheet.create({
