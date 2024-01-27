@@ -16,8 +16,8 @@ export interface ToastHandle {
 }
 
 export const Toast = React.forwardRef<ToastHandle>((_, ref) => {
-    const [opacity, setOpacity] = useState<Animated.Value>(new Animated.Value(0)),
-        [position, setPosition] = useState<Animated.Value>(new Animated.Value(25)),
+    const opacity = useRef<Animated.Value>(new Animated.Value(0)),
+        position = useRef<Animated.Value>(new Animated.Value(25)),
         [message, setMessage] = useState<string>(''),
         [type, setType] = useState<ToastType>(ToastType.Success),
         timeout = useRef<any>();
@@ -26,7 +26,7 @@ export const Toast = React.forwardRef<ToastHandle>((_, ref) => {
 
     return <Animated.View style={[
         styles.container,
-        { opacity, transform: [{ translateY: position }] }
+        { opacity: opacity.current, transform: [{ translateY: position.current }] }
     ]}>
         <View style={[styles.wrapper, { backgroundColor: getBackgroundColour(type) }]}>
             <Text style={styles.text}>{message}</Text>
@@ -80,14 +80,14 @@ export const Toast = React.forwardRef<ToastHandle>((_, ref) => {
 
     async function toggle(visible: boolean) : Promise<void> {
         return new Promise<void>(resolve => {
-            Animated.timing(opacity, {
+            Animated.timing(opacity.current, {
                 toValue: visible ? 1 : 0,
                 duration: 150,
                 useNativeDriver: true,
                 easing: Easing.linear
             }).start();
 
-            Animated.timing(position, {
+            Animated.timing(position.current, {
                 toValue: visible ? 0 : 25,
                 duration: 150,
                 useNativeDriver: true,
