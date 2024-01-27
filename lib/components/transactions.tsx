@@ -17,11 +17,6 @@ type Props = {
     onRefresh: () => void;
 }
 
-interface TransactionsState {
-    detailsTransaction: Transaction | null;
-    splitTransaction: Transaction | null;
-}
-
 export const Transactions = (props: Props) => {
     const [detailsTransaction, setDetailsTransaction] = React.useState<Transaction | null>(null);
     const [splitTransaction, setSplitTransaction] = React.useState<Transaction | null>(null);
@@ -90,80 +85,6 @@ export const Transactions = (props: Props) => {
         />
     </View>;
 }
-
-class OldTransactions extends React.Component<Props, TransactionsState> {
-    state = {
-        detailsTransaction: null,
-        splitTransaction: null
-    }
-
-    render() {
-        const transactions = this.props.transactions;
-        return <View style={styles.container}>
-            {!transactions.length && <Text style={styles.noTransactionsText}>No transactions</Text>}
-            {(transactions || [])
-                .map((transaction: Transaction, index: number) => this.renderTransaction(transaction, index))}
-
-            <TransactionDetailsModal
-                transaction={this.state.detailsTransaction}
-                tags={this.props.tags}
-                onClose={() => this.setState({ detailsTransaction: null })}
-                onChange={(transaction: Transaction) => this.props.onChange(transaction)}
-            />
-
-            <TransactionSplitModal
-                transaction={this.state.splitTransaction}
-                onClose={() => this.setState({ splitTransaction: null })}
-                onError={(message: string) => this.props.onError(message)}
-                onSplit={() => this.onTransactionSplit()}
-            />
-        </View>;
-    }
-
-    private renderTransaction(transaction: Transaction, index: number) {
-        return <TouchableOpacity
-            onPress={() => !transaction.balance && this.onPress(transaction)}
-            onLongPress={() => !transaction.balance && this.onLongPress(transaction)}
-            activeOpacity={0.8}
-            key={transaction.description + index}
-        >
-            <View style={[styles.transaction, transaction.ignored || transaction.balance || transaction.tags.some(t => t.ignore) ? styles.transactionIgnored : null]}>
-                <View style={[styles.transactionOwner, { backgroundColor: transaction.owner === 'Chris' ? Colours.chris : Colours.sarah }]}></View>
-                <View style={styles.transactionDetails}>
-                    <Text style={styles.transactionDate}>{dayjs(transaction.date).format('MM/DD')}</Text>
-                    <Text style={styles.transactionDescription}>{transaction.description}</Text>
-                    <Text style={styles.transactionAmount}>{`$${transaction.amount.toFixed(2)}`}</Text>
-                </View>
-            </View>
-        </TouchableOpacity>;
-    }
-
-    private onPress(transaction: Transaction) {
-        if (this.canEdit(transaction))
-            this.setState({ detailsTransaction: transaction });
-        else
-            this.props.onError('Unable to edit transaction because it occurred too long ago.');
-    }
-
-    private onLongPress(transaction: Transaction) {
-        if (this.canEdit(transaction)) {
-            Vibration.vibrate(10);
-            this.setState({ splitTransaction: transaction });
-        } else
-            this.props.onError('Unable to edit transaction because it occurred too long ago.');
-    }
-
-    private onTransactionSplit() {
-        this.setState({ splitTransaction: null });
-        this.props.onRefresh();
-    }
-
-    private canEdit(transaction: Transaction) : boolean {
-        const startOfPreviousWeek = dayjs().startOf('week').add(1, 'day').subtract(1, 'week');
-        return dayjs(transaction.date).isAfter(startOfPreviousWeek);
-    }
-}
-
 
 const styles = StyleSheet.create({
     container: {

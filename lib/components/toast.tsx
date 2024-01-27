@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { useImperativeHandle, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Animated, Easing } from 'react-native';
-
 import Colours from '../colours';
 
 export enum ToastType {
@@ -9,7 +8,7 @@ export enum ToastType {
     Success
 }
 
-export interface ToastHandle {
+export type ToastHandle = {
     clear: () => void;
     error: (message: string) => void;
     success: (message: string) => void;
@@ -98,7 +97,6 @@ export const Toast = React.forwardRef<ToastHandle>((_, ref) => {
         });
     }
 });
-
 
 const styles = StyleSheet.create({
     container: {

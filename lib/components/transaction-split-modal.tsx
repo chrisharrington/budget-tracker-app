@@ -6,7 +6,6 @@ import Colours from '../colours';
 import BudgetApi from '../data/budget';
 import { Modal } from './modal';
 
-
 type Props = {
     transaction: Transaction | null;
     onClose: () => void;

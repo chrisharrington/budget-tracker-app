@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import ReactModal from 'react-native-modal';
 import Colours from '../colours';
 
-type ModalProps = {
+type Props = {
     visible: boolean;
     onClose: () => void;
     onSave: () => void;
@@ -11,7 +11,7 @@ type ModalProps = {
     saveButtonDisabled?: boolean;
 } & React.PropsWithChildren;
 
-export const Modal = (props : ModalProps) => (
+export const Modal = (props : Props) => (
     <ReactModal
         isVisible={props.visible}
         backdropOpacity={0.4}
