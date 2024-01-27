@@ -5,7 +5,7 @@ import timezone from 'dayjs/plugin/timezone';
 import { Tag, Transaction } from '../models';
 import Colours from '../colours';
 import TransactionDetailsModal from './transaction-details-modal';
-import TransactionSplitModal from './transaction-split-modal';
+import { TransactionSplitModal } from './transaction-split-modal';
 
 dayjs.extend(timezone);
 
