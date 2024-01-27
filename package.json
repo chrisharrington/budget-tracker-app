@@ -11,6 +11,9 @@
     "log": "npx react-native log-android"
   },
   "dependencies": {
+    "@react-navigation/bottom-tabs": "^6.5.11",
+    "@react-navigation/native": "^6.1.9",
+    "babel-plugin-module-resolver": "^5.0.0",
     "dayjs": "^1.11.9",
     "expo": "latest",
     "expo-constants": "~15.4.5",
