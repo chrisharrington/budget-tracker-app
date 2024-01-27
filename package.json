@@ -15,7 +15,6 @@
     "expo": "latest",
     "expo-constants": "~15.4.5",
     "expo-notifications": "~0.27.6",
-    "expo-splash-screen": "~0.26.4",
     "expo-status-bar": "~1.11.1",
     "expo-updates": "~0.24.9",
     "react": "18.2.0",

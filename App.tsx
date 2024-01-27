@@ -1,31 +1,26 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, View, StatusBar as ReactStatusBar, ScrollView, RefreshControl, TouchableOpacity, Text, AppState, AppStateStatus } from 'react-native';
+import { StyleSheet, View, StatusBar as ReactStatusBar, ScrollView, RefreshControl, TouchableOpacity, Text, AppState, AppStateStatus, ActivityIndicator, LogBox } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
-import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
 import dayjs from 'dayjs';
 import Constants from 'expo-constants';
-
 import DeviceApi from './lib/data/device';
 import Colours from './lib/colours';
 import { Transaction, Budget, Tag, OneTime } from './lib/models';
 import BudgetApi from './lib/data/budget';
 import TagApi from './lib/data/tag';
 import { Toast, ToastHandle } from './lib/components/toast';
-
 import Progress from './lib/components/progress';
 import Transactions from './lib/components/transactions';
 import OneTimeApi from './lib/data/one-time';
 
-SplashScreen.preventAutoHideAsync();
+LogBox.ignoreLogs(['new NativeEventEmitter()']);
 
-
-export default () => <App />;
-
-const App = () => {
+export default () => {
     const [budget, setBudget] = useState<Budget | null>(),
+        [loading, setLoading] = useState<boolean>(true),
         [transactions, setTransactions] = useState<Transaction[]>([]),
         [tags, setTags] = useState<Tag[]>([]),
         [oneTime, setOneTime] = useState<OneTime | null>(null),
@@ -73,10 +68,15 @@ const App = () => {
             } catch (e) {
                 setError(e as Error);
             } finally {
-                await SplashScreen.hideAsync();
+                setLoading(false);
             }
         })();
     }, []);
+
+    if (loading)
+        return <View style={styles.loadingContainer}>
+            <ActivityIndicator size={36} color={Colours.button.positive} />
+        </View>
 
     if (error)
         return <View style={styles.errorContainer}>
@@ -357,5 +357,11 @@ const styles = StyleSheet.create({
 
     errorText: {
         color: Colours.text.default
+    },
+
+    loadingContainer: {
+        flex: 1,
+        alignContent: 'center',
+        justifyContent: 'center'
     }
 });
