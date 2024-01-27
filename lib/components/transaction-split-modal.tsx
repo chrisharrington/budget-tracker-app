@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import dayjs from 'dayjs';
 
 import { Transaction } from '../models';
@@ -61,14 +61,21 @@ export default class TransactionSplitModal extends React.Component<TransactionSp
                 </View>
                 <View style={styles.amountsContainer}>
                     <Text style={styles.amountLabel}>Second Transaction</Text>
-                    <TextInput
-                        style={styles.amountInput}
-                        placeholder='$12.34'
-                        value={this.state.secondAmount.toString()}
-                        onChangeText={value => this.onSecondAmountChanged(value)}
-                        autoFocus
-                        keyboardType='decimal-pad'
-                    />
+
+                    <View style={styles.amountsInputContainer}>
+                        <TextInput
+                            style={styles.amountInput}
+                            placeholder='$12.34'
+                            value={this.state.secondAmount.toString()}
+                            onChangeText={value => this.onSecondAmountChanged(value)}
+                            autoFocus
+                            keyboardType='decimal-pad'
+                        />
+
+                        <TouchableOpacity style={styles.amountInputFiftyPercent} onPress={() => this.onFiftyPercent()}>
+                            <Text style={styles.amountInputFiftyPercentText}>50%</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
                 <View style={[styles.amountsContainer, styles.totalAmounts]}>
                     <Text style={styles.amountLabel}>Total</Text>
@@ -81,6 +88,16 @@ export default class TransactionSplitModal extends React.Component<TransactionSp
     private onSecondAmountChanged(amount: string) {
         this.setState({
             secondAmount: amount
+        });
+    }
+
+    private onFiftyPercent() {
+        const transaction = this.state.transaction;
+        if (!transaction)
+            return;
+
+        this.setState({
+            secondAmount: (transaction.amount / 2).toFixed(2)
         });
     }
 
@@ -167,13 +184,37 @@ const styles = StyleSheet.create({
         backgroundColor: Colours.background.error
     },
 
-    amountInput: {
+    amountsInputContainer: {
         width: '100%',
+        flexDirection: 'row',
+        gap: 15
+    },
+
+    amountInput: {
+        flex: 3,
         color: 'black',
         fontSize: 16,
         marginTop: 6,
-        padding: 10,
+        paddingHorizontal: 10,
+        paddingVertical: 8,
         backgroundColor: 'white',
+        borderRadius: 3
+    },
+
+    amountInputFiftyPercent: {
+        flex: 1,
+        alignItems: 'center',
+        marginTop: 6,
+        textTransform: 'uppercase',
+        fontWeight: 'bold',
         borderRadius: 3,
+        height: 46,
+        backgroundColor: Colours.button.positive
+    },
+
+    amountInputFiftyPercentText: {
+        color: Colours.text.default,
+        height: 46,
+        textAlignVertical: 'center'
     }
 });
