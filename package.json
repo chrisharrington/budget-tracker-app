@@ -12,23 +12,23 @@
   },
   "dependencies": {
     "dayjs": "^1.11.9",
-    "expo": "~49.0.7",
-    "expo-constants": "^14.4.2",
-    "expo-notifications": "~0.20.1",
-    "expo-splash-screen": "~0.20.5",
-    "expo-status-bar": "~1.6.0",
-    "expo-updates": "~0.18.17",
+    "expo": "latest",
+    "expo-constants": "~15.4.5",
+    "expo-notifications": "~0.27.6",
+    "expo-splash-screen": "~0.26.4",
+    "expo-status-bar": "~1.11.1",
+    "expo-updates": "~0.24.9",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-native": "0.72.4",
+    "react-native": "0.73.2",
     "react-native-circular-progress": "^1.3.9",
     "react-native-modal": "^13.0.1",
-    "react-native-svg": "13.9.0",
+    "react-native-svg": "14.1.0",
     "typescript": "^5.1.3"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
-    "@types/react": "^18.2.20",
+    "@types/react": "~18.2.45",
     "react-native-dotenv": "^3.4.9"
   },
   "private": true
