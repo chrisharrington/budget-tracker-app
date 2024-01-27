@@ -2,45 +2,42 @@ import * as React from 'react';
 import { View, Text, StyleSheet, StatusBar } from 'react-native';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import dayjs from 'dayjs';
-
 import Colours from '../colours';
 import { Budget } from '../models';
 import CurrencyHelpers from '../helpers/currency';
 
-interface IProgressProps {
+type Props = {
     budget: Budget;
     amount: number;
 }
 
-export default class Progress extends React.Component<IProgressProps> {
-    render() {
-        const budget = this.props.budget,
-            remainingDays = this.getRemainingDays(),
-            amount = this.props.amount,
-            isNegative = amount < 0;
+export const Progress = (props: Props) => {
+    const budget = props.budget,
+        remainingDays = React.useMemo(() => getRemainingDays(), [dayjs().startOf('d').format()]),
+        amount = props.amount,
+        isNegative = amount < 0;
 
-        return <View style={styles.balanceWrapper}>
-            <AnimatedCircularProgress
-                size={300}
-                width={10}
-                fill={amount / budget.weeklyAmount * 100}
-                tintColor={isNegative ? Colours.background.error : Colours.highlight.default}
-                backgroundColor={isNegative ? Colours.background.error : Colours.highlight.dark}
-                rotation={0}
-            >
-                {
-                    () => (
-                        <View>
-                            <Text style={styles.balanceText}>{CurrencyHelpers.format(amount)}</Text>
-                            <Text style={styles.balanceSubText}>{`${remainingDays} day${remainingDays === 1 ? '' : 's'} remaining`}</Text>
-                        </View>
-                    )
-                }
-            </AnimatedCircularProgress>
-        </View>;
-    }
+    return <View style={styles.balanceWrapper}>
+        <AnimatedCircularProgress
+            size={300}
+            width={10}
+            fill={amount / budget.weeklyAmount * 100}
+            tintColor={isNegative ? Colours.background.error : Colours.highlight.default}
+            backgroundColor={isNegative ? Colours.background.error : Colours.highlight.dark}
+            rotation={0}
+        >
+            {
+                () => (
+                    <View>
+                        <Text style={styles.balanceText}>{CurrencyHelpers.format(amount)}</Text>
+                        <Text style={styles.balanceSubText}>{`${remainingDays} day${remainingDays === 1 ? '' : 's'} remaining`}</Text>
+                    </View>
+                )
+            }
+        </AnimatedCircularProgress>
+    </View>;
 
-    private getRemainingDays() : number {
+    function getRemainingDays() {
         let remaining = 0,
             date = dayjs().startOf('d');
 
@@ -52,7 +49,6 @@ export default class Progress extends React.Component<IProgressProps> {
         return remaining === 0 ? 7 : remaining;
     }
 }
-
 
 const styles = StyleSheet.create({
     dateWrapper: {

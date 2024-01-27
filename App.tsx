@@ -12,7 +12,7 @@ import { Transaction, Budget, Tag, OneTime } from './lib/models';
 import BudgetApi from './lib/data/budget';
 import TagApi from './lib/data/tag';
 import { Toast, ToastHandle } from './lib/components/toast';
-import Progress from './lib/components/progress';
+import { Progress } from './lib/components/progress';
 import { Transactions } from './lib/components/transactions';
 import OneTimeApi from './lib/data/one-time';
 
