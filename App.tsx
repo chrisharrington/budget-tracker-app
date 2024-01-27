@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { StyleSheet, View, StatusBar as ReactStatusBar, LogBox } from 'react-native';
 import * as Notifications from 'expo-notifications';
-import { Ionicons } from '@expo/vector-icons'
+import { Ionicons, FontAwesome } from '@expo/vector-icons'
 import * as Font from 'expo-font';
 import Constants from 'expo-constants';
 import { NavigationContainer } from '@react-navigation/native';
@@ -17,7 +17,8 @@ LogBox.ignoreLogs(['new NativeEventEmitter()']);
 
 type TabParamList = {
     Transactions: {},
-    Allowances: {}
+    Quinn: {},
+    Zoe: {}
 }
 
 const Tab = createBottomTabNavigator<TabParamList>();
@@ -69,15 +70,23 @@ export default () => {
                         name='Transactions'
                         component={TransactionsScreen}
                         options={{
-                            tabBarIcon: ({ size }) => <Ionicons name='list' color={Colours.text.default} size={size} />
+                            tabBarIcon: () => <Ionicons name='list' color={Colours.text.default} size={22} />
                         }}
                     />
 
                     <Tab.Screen
-                        name='Allowances'
+                        name='Quinn'
                         component={AllowancesScreen}
                         options={{
-                            tabBarIcon: ({ size }) => <Ionicons name='people' color={Colours.text.default} size={size} />
+                            tabBarIcon: () => <FontAwesome name='dollar' color={Colours.text.default} size={18} />
+                        }}
+                    />
+
+                    <Tab.Screen
+                        name='Zoe'
+                        component={AllowancesScreen}
+                        options={{
+                            tabBarIcon: () => <FontAwesome name='dollar' color={Colours.text.default} size={18} />
                         }}
                     />
                 </Tab.Navigator>
