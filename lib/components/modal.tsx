@@ -1,9 +1,6 @@
 import * as React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import ReactModal from 'react-native-modal';
-import dayjs from 'dayjs';
-
-import { Tag, Transaction } from '../models';
 import Colours from '../colours';
 
 type ModalProps = {
@@ -14,30 +11,27 @@ type ModalProps = {
     saveButtonDisabled?: boolean;
 } & React.PropsWithChildren;
 
-export default class Modal extends React.Component<ModalProps> {
-    render() {
-        return <ReactModal
-            isVisible={this.props.visible}
-            backdropOpacity={0.4}
-            hideModalContentWhileAnimating={true}
-            backdropTransitionOutTiming={0}
-            style={styles.modal}
-        >
-            <View style={styles.inner}>
-                {this.props.children}
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={() => this.props.onClose()}>
-                        <Text style={styles.buttonText}>Cancel</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[styles.button, styles.saveButton, this.props.saveButtonDisabled ? styles.saveButtonDisabled : undefined]} disabled={this.props.saveButtonDisabled} onPress={() => this.props.onSave()}>
-                        <Text style={styles.buttonText}>{this.props.saveButtonText || 'Save'}</Text>
-                    </TouchableOpacity>
-                </View>
+export const Modal = (props : ModalProps) => (
+    <ReactModal
+        isVisible={props.visible}
+        backdropOpacity={0.4}
+        hideModalContentWhileAnimating={true}
+        backdropTransitionOutTiming={0}
+        style={styles.modal}
+    >
+        <View style={styles.inner}>
+            {props.children}
+            <View style={styles.buttonContainer}>
+                <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={() => props.onClose()}>
+                    <Text style={styles.buttonText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.button, styles.saveButton, props.saveButtonDisabled ? styles.saveButtonDisabled : undefined]} disabled={props.saveButtonDisabled} onPress={() => props.onSave()}>
+                    <Text style={styles.buttonText}>{props.saveButtonText || 'Save'}</Text>
+                </TouchableOpacity>
             </View>
-        </ReactModal>;
-    }
-}
-
+        </View>
+    </ReactModal>
+);
 
 const styles = StyleSheet.create({
     modal: {
