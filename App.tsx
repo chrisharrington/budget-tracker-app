@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { StyleSheet, View, StatusBar as ReactStatusBar, LogBox } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
+import { Ionicons } from '@expo/vector-icons'
 import * as Font from 'expo-font';
 import Constants from 'expo-constants';
 import { NavigationContainer } from '@react-navigation/native';
@@ -19,7 +19,7 @@ type TabParamList = {
     Allowances: {}
 }
 
-// const Tab = createBottomTabNavigator<TabParamList>();
+const Tab = createBottomTabNavigator<TabParamList>();
 
 export default () => {
     const toast = useRef<ToastHandle>(null);
@@ -53,25 +53,25 @@ export default () => {
 
     return <NavigationContainer>
         <View style={styles.container}>
-            <StatusBar
-                style='light'
-            />
-
             <Toast ref={toast} />
 
             <StateContext.Provider value={{ toast: toast.current as ToastHandle }}>
-                <TransactionsScreen />
-                {/* <Tab.Navigator
+                <Tab.Navigator
                     initialRouteName='Transactions'
                     screenOptions={{
-                        headerShown: false
+                        headerShown: false,
+                        tabBarLabelStyle: { color: Colours.text.default, paddingBottom: 4 },
+                        tabBarStyle: { backgroundColor: Colours.background.dark, borderTopWidth: 0 }
                     }}
                 >
                     <Tab.Screen
                         name='Transactions'
                         component={TransactionsScreen}
+                        options={{
+                            tabBarIcon: ({ size }) => <Ionicons name='list' color={Colours.text.default} size={size} />
+                        }}
                     />
-                </Tab.Navigator> */}
+                </Tab.Navigator>
             </StateContext.Provider>
         </View>
     </NavigationContainer>;
