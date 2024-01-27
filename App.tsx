@@ -1,22 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, View, StatusBar as ReactStatusBar, ScrollView, RefreshControl, TouchableOpacity, Text, AppState, AppStateStatus, ActivityIndicator, LogBox } from 'react-native';
+import { StyleSheet, View, StatusBar as ReactStatusBar, LogBox } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
 import * as Font from 'expo-font';
-import { Ionicons } from '@expo/vector-icons';
-import dayjs from 'dayjs';
 import Constants from 'expo-constants';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import DeviceApi from './lib/data/device';
 import Colours from './lib/colours';
-import { Transaction, Budget, Tag, OneTime } from './lib/models';
-import BudgetApi from './lib/data/budget';
-import TagApi from './lib/data/tag';
 import { Toast, ToastHandle } from './lib/components/toast';
-import { Progress } from './lib/components/progress';
-import { Transactions } from './lib/components/transactions';
-import OneTimeApi from './lib/data/one-time';
 import { TransactionsScreen } from '@lib/screens/transactions';
 import { StateContext } from '@lib/context';
 
@@ -27,11 +19,10 @@ type TabParamList = {
     Allowances: {}
 }
 
-const Tab = createBottomTabNavigator<TabParamList>();
+// const Tab = createBottomTabNavigator<TabParamList>();
 
 export default () => {
-    const toast = useRef<ToastHandle>(null),
-        [error, setError] = useState<Error | null>(null);
+    const toast = useRef<ToastHandle>(null);
 
     useEffect(() => {
         (async () => {
@@ -69,12 +60,18 @@ export default () => {
             <Toast ref={toast} />
 
             <StateContext.Provider value={{ toast: toast.current as ToastHandle }}>
-                <Tab.Navigator initialRouteName='Transactions'>
+                <TransactionsScreen />
+                {/* <Tab.Navigator
+                    initialRouteName='Transactions'
+                    screenOptions={{
+                        headerShown: false
+                    }}
+                >
                     <Tab.Screen
                         name='Transactions'
                         component={TransactionsScreen}
                     />
-                </Tab.Navigator>
+                </Tab.Navigator> */}
             </StateContext.Provider>
         </View>
     </NavigationContainer>;
