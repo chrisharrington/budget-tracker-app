@@ -1,3 +1,9 @@
+export type TabParamList = {
+    Transactions: {},
+    Quinn: {},
+    Zoe: {}
+};
+
 export class Id {
     _id: string;
 }

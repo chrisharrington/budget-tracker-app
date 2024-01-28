@@ -11,15 +11,10 @@ import Colours from './lib/colours';
 import { Toast, ToastHandle } from './lib/components/toast';
 import { TransactionsScreen } from '@lib/screens/transactions';
 import { StateContext } from '@lib/context';
-import { AllowancesScreen } from '@lib/screens/allowances';
+import { QuinnAllowancesScreen, ZoeAllowancesScreen } from '@lib/screens/allowances';
+import { TabParamList } from '@lib/models';
 
 LogBox.ignoreLogs(['new NativeEventEmitter()']);
-
-type TabParamList = {
-    Transactions: {},
-    Quinn: {},
-    Zoe: {}
-}
 
 const Tab = createBottomTabNavigator<TabParamList>();
 
@@ -76,7 +71,7 @@ export default () => {
 
                     <Tab.Screen
                         name='Quinn'
-                        component={AllowancesScreen}
+                        component={QuinnAllowancesScreen}
                         options={{
                             tabBarIcon: () => <FontAwesome name='dollar' color={Colours.text.default} size={18} />
                         }}
@@ -84,7 +79,7 @@ export default () => {
 
                     <Tab.Screen
                         name='Zoe'
-                        component={AllowancesScreen}
+                        component={ZoeAllowancesScreen}
                         options={{
                             tabBarIcon: () => <FontAwesome name='dollar' color={Colours.text.default} size={18} />
                         }}

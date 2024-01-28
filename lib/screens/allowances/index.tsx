@@ -1,21 +1,16 @@
 import React from 'react';
-import { View, Text, StyleSheet, StatusBar as ReactStatusBar } from 'react-native';
-import Colours from '@lib/colours';
+import { View, Text } from 'react-native';
+import { styles } from './style';
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import { TabParamList } from '@lib/models';
 
-type Props = {
+type Props = BottomTabScreenProps<TabParamList, 'Quinn' | 'Zoe'>;
 
-}
+export const QuinnAllowancesScreen = (props : Props) => <AllowancesScreen {...props} owner='quinn' />;
+export const ZoeAllowancesScreen = (props : Props) => <AllowancesScreen {...props} owner='zoe' />;
 
-export const AllowancesScreen = ({} : Props) => {
+const AllowancesScreen = ({ owner } : Props & { owner: string }) => {
     return <View style={styles.container}>
-        <Text style={{ color: 'white' }}>allowances</Text>
+        <Text style={{ color: 'white' }}>{owner}</Text>
     </View>;
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: Colours.background.default,
-        paddingTop: ReactStatusBar.currentHeight
-    }
-});
