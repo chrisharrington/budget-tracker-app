@@ -2,9 +2,9 @@ export default class Colours {
     static background = {
         default: '#333333',
         light: '#404040',
-        dark: '#2a2a2a',
-        error: '#bd1e18',
-        success: '#35bd18',
+        dark: '#2A2A2A',
+        error: '#BD1E18',
+        success: '#35BD18',
         highlight: '#606060'
     };
 
@@ -14,10 +14,12 @@ export default class Colours {
     };
 
     static text = {
-        default: '#ffffff',
-        lowlight: '#aaaaaa',
-        success: '#1edf24',
-        error: '#FA4539'
+        default: '#FFFFFF',
+        lowlight: '#AAAAAA',
+        success: '#1EDF24',
+        error: '#FA4539',
+        positive: '#1EDF24',
+        negative: '#FA4539'
     };
 
     static button = {
@@ -32,5 +34,5 @@ export default class Colours {
     };
 
     static chris: string = '#46D3FF';
-    static sarah: string = '#fc0fc0';
+    static sarah: string = '#FC0FC0';
 }

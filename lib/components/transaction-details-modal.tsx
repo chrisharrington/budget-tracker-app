@@ -12,7 +12,7 @@ type Props = {
     onChange: (transaction: Transaction) => void;
 }
 
-const TransactionDetailsModal = (props: Props) => {
+export const TransactionDetailsModal = (props: Props) => {
     const [transaction, setTransaction] = React.useState<Transaction | null>(null),
         [selectedTags, setSelectedTags] = React.useState<Tag[]>([]);
 
@@ -20,7 +20,7 @@ const TransactionDetailsModal = (props: Props) => {
         const newTransaction = props.transaction;
         if (newTransaction && (!transaction || transaction.amount !== newTransaction.amount)) {
             setTransaction(newTransaction);
-            setSelectedTags(newTransaction.tags);
+            setSelectedTags(newTransaction.tags || []);
         }
     }, [props.transaction]);
 
@@ -66,75 +66,6 @@ const TransactionDetailsModal = (props: Props) => {
         </>}
     </Modal>;
 }
-
-export default TransactionDetailsModal;
-
-// class OldTransactionDetailsModal extends React.Component<Props, TransactionDetailsModalState> {
-//     state = {
-//         transaction: null as Transaction | null,
-//         error: false,
-//         selectedTags: []
-//     }
-
-//     componentDidUpdate(prev: Props) {
-//         const oldTransaction = prev.transaction,
-//             newTransaction = props.transaction;
-
-//         if (newTransaction && (!oldTransaction || oldTransaction.amount !== newTransaction.amount))
-//             this.setState({
-//                 error: false,
-//                 transaction: newTransaction,
-//                 selectedTags: newTransaction.tags
-//             });
-//     }
-
-//     render() {
-//         const transaction = this.state.transaction as Transaction | null;
-//         return <Modal
-//             visible={!!props.transaction}
-//             onClose={() => props.onClose()}
-//             onSave={() => this.onSave()}
-//         >
-//             {transaction && <>
-//                 <Text style={styles.description}>{transaction.description}</Text>
-//                 <Text style={styles.date}>{`${dayjs(transaction.date).format('MMMM D, YYYY')} at ${dayjs(transaction.date).format('h:mm:ss a')}`}</Text>
-//                 <View>
-//                     {props.tags.map((tag: Tag) => (
-//                         <View style={styles.tagWrapper} key={tag._id}>
-//                             <TouchableOpacity activeOpacity={0.5} onPress={() => this.onToggleTag(tag)}>
-//                                 <Text style={[styles.tag, (this.state.selectedTags || []).find((t: Tag) => t.name === tag.name) ? styles.selectedTag : undefined]}>{`#${tag.name}`}</Text>
-//                             </TouchableOpacity>
-//                         </View>
-//                     ))}
-//                 </View>
-//             </>}
-//         </Modal>;
-//     }
-
-//     private onToggleTag(tag: Tag) {
-//         const tags = this.state.selectedTags || [],
-//             found = tags.find((t: Tag) => t._id === tag._id);
-
-//         const selectedTags = found ?
-//             tags.filter((t: Tag) => t._id !== tag._id) :
-//             [...tags, tag].sort((first, second) => first.name.localeCompare(second.name));
-
-//         this.setState({ selectedTags });
-//     }
-
-//     private onSave() {
-//         try {
-//             const transaction = this.state.transaction;
-//             if (transaction) {
-//                 transaction.tags = this.state.selectedTags;
-//                 props.onChange(transaction);
-//                 props.onClose();
-//             }
-//         } catch (e) {
-//             console.error(e);
-//         }
-//     }
-// }
 
 const styles = StyleSheet.create({
     description: {

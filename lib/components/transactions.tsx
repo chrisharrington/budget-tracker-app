@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import { Tag, Transaction } from '../models';
 import Colours from '../colours';
-import TransactionDetailsModal from './transaction-details-modal';
+import { TransactionDetailsModal } from './transaction-details-modal';
 import { TransactionSplitModal } from './transaction-split-modal';
 
 dayjs.extend(timezone);
@@ -28,7 +28,7 @@ export const Transactions = (props: Props) => {
             activeOpacity={0.8}
             key={transaction.description + index}
         >
-            <View style={[styles.transaction, transaction.ignored || transaction.balance || transaction.tags.some(t => t.ignore) ? styles.transactionIgnored : null]}>
+            <View style={[styles.transaction, transaction.ignored || transaction.balance || (transaction.tags || []).some(t => t.ignore) ? styles.transactionIgnored : null]}>
                 <View style={[styles.transactionOwner, { backgroundColor: transaction.owner === 'Chris' ? Colours.chris : Colours.sarah }]}></View>
                 <View style={styles.transactionDetails}>
                     <Text style={styles.transactionDate}>{dayjs(transaction.date).format('MM/DD')}</Text>

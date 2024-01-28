@@ -23,9 +23,10 @@ export class Transaction extends Id {
     date: Date;
     description: string;
     owner: string;
-    ignored: boolean;
-    balance: boolean;
-    tags: Tag[];
+    ignored?: boolean;
+    balance?: boolean;
+    tags?: Tag[];
+    isAllowancePayment?: boolean;
 
     constructor() {
         super();

@@ -25,7 +25,7 @@ export const TransactionsScreen = ({ }: Props) => {
 
         dateRef = useRef<Date>(dayjs().toDate());
 
-    const amount = useMemo(() => (budget?.weeklyAmount || 0) - transactions.filter(transaction => !transaction.ignored && transaction.tags.every(tag => !tag.ignore))
+    const amount = useMemo(() => (budget?.weeklyAmount || 0) - transactions.filter(transaction => !transaction.ignored && (transaction.tags || []).every(tag => !tag.ignore))
         .map(b => b.amount)
         .reduce((sum, amount) => sum + amount, 0), [budget, transactions]);
 
