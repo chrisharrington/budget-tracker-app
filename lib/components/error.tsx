@@ -17,7 +17,7 @@ export const Error = ({ error } : Props) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: Colours.background.error,
+        backgroundColor: Colours.background.negative,
         borderRadius: 5,
         padding: 15,
         paddingTop: 15 + (StatusBar.currentHeight || 0)

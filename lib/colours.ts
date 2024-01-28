@@ -3,8 +3,9 @@ export default class Colours {
         default: '#333333',
         light: '#404040',
         dark: '#2A2A2A',
-        error: '#BD1E18',
-        success: '#35BD18',
+        darker: '#1A1A1A',
+        negative: '#BD1E18',
+        positive: '#35BD18',
         highlight: '#606060'
     };
 
@@ -15,6 +16,7 @@ export default class Colours {
 
     static text = {
         default: '#FFFFFF',
+        dark: '#000000',
         lowlight: '#AAAAAA',
         success: '#1EDF24',
         error: '#FA4539',

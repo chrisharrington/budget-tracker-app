@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     },
 
     amountValueError: {
-        backgroundColor: Colours.background.error
+        backgroundColor: Colours.background.negative
     },
 
     amountsInputContainer: {

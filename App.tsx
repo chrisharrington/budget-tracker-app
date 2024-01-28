@@ -1,11 +1,11 @@
 import React, { useEffect, useRef } from 'react';
-import { StyleSheet, View, StatusBar as ReactStatusBar, LogBox } from 'react-native';
+import { StyleSheet, View, StatusBar as ReactStatusBar, LogBox, Text } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { Ionicons, FontAwesome } from '@expo/vector-icons'
 import * as Font from 'expo-font';
 import Constants from 'expo-constants';
 import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { BottomTabBarProps, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import DeviceApi from './lib/data/device';
 import Colours from './lib/colours';
 import { Toast, ToastHandle } from './lib/components/toast';
@@ -55,38 +55,53 @@ export default () => {
             <NavigationContainer>
                 <Tab.Navigator
                     initialRouteName='Transactions'
+                    tabBar={props => <TabBar {...props} />}
                     screenOptions={{
-                        headerShown: false,
-                        tabBarLabelStyle: { color: Colours.text.default, paddingBottom: 4 },
-                        tabBarStyle: { backgroundColor: Colours.background.dark, borderTopWidth: 0 }
+                        headerShown: false
                     }}
                 >
                     <Tab.Screen
                         name='Transactions'
                         component={TransactionsScreen}
-                        options={{
-                            tabBarIcon: () => <Ionicons name='list' color={Colours.text.default} size={22} />
-                        }}
                     />
 
                     <Tab.Screen
                         name='Quinn'
                         component={QuinnAllowancesScreen}
-                        options={{
-                            tabBarIcon: () => <FontAwesome name='dollar' color={Colours.text.default} size={18} />
-                        }}
                     />
 
                     <Tab.Screen
                         name='Zoe'
                         component={ZoeAllowancesScreen}
-                        options={{
-                            tabBarIcon: () => <FontAwesome name='dollar' color={Colours.text.default} size={18} />
-                        }}
                     />
                 </Tab.Navigator>
             </NavigationContainer>
         </StateContext.Provider>
+    </View>;
+}
+
+function TabBar(props: BottomTabBarProps) {
+    return <View style={styles.tabBar}>
+        {props.state.routes.map((route, index) => {
+            const isFocused = props.state.index === index;
+
+            const onPress = () => {
+                if (!isFocused)
+                    props.navigation.navigate(route.name);
+            };
+
+            return <View key={route.key} style={styles.tabBarLabelWrapper}>
+                <Text
+                    style={[styles.tabBarLabel, {
+                        backgroundColor: isFocused ? Colours.background.positive : Colours.background.darker,
+                        color: isFocused ? Colours.text.dark : Colours.text.default
+                    }]}
+                    onPress={onPress}
+                >
+                    {route.name}
+                </Text>
+            </View>;
+        })}
     </View>;
 }
 
@@ -96,5 +111,28 @@ const styles = StyleSheet.create({
         backgroundColor: Colours.background.default,
         flexDirection: 'column',
         paddingTop: ReactStatusBar.currentHeight
+    },
+
+    tabBar: {
+        flexDirection: 'row',
+        gap: 10,
+        paddingHorizontal: 10,
+        backgroundColor: Colours.background.dark,
+        borderTopWidth: 0,
+    },
+
+    tabBarLabelWrapper: {
+        flex: 1,
+        paddingVertical: 12
+    },
+
+    tabBarLabel: {
+        color: Colours.text.default,
+        padding: 10,
+        fontSize: 12,
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
+        borderRadius: 4,
+        textAlign: 'center'
     }
 });

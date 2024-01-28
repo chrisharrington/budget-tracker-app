@@ -22,8 +22,8 @@ export const Progress = (props: Props) => {
             size={300}
             width={10}
             fill={amount / budget.weeklyAmount * 100}
-            tintColor={isNegative ? Colours.background.error : Colours.highlight.default}
-            backgroundColor={isNegative ? Colours.background.error : Colours.highlight.dark}
+            tintColor={isNegative ? Colours.background.negative : Colours.highlight.default}
+            backgroundColor={isNegative ? Colours.background.negative : Colours.highlight.dark}
             rotation={0}
         >
             {

@@ -69,9 +69,9 @@ export const Toast = React.forwardRef<ToastHandle>((_, ref) => {
     function getBackgroundColour(type: ToastType) : string {
         switch (type) {
             case ToastType.Error:
-                return Colours.background.error;
+                return Colours.background.negative;
             case ToastType.Success:
-                return Colours.background.success;
+                return Colours.background.positive;
             default:
                 return Colours.background.default;
         }
