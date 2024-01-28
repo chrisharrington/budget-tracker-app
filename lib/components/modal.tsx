@@ -36,17 +36,19 @@ export const Modal = (props : Props) => (
 const styles = StyleSheet.create({
     modal: {
         justifyContent: 'flex-start',
-        paddingTop: 50
     },
 
     inner: {
+        flex: 1,
         backgroundColor: Colours.background.default,
         padding: 25,
         borderRadius: 5
     },
 
     buttonContainer: {
-        flexDirection: 'row'
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'flex-end'
     },
 
     button: {

@@ -54,7 +54,7 @@ export const TransactionDetailsModal = (props: Props) => {
         {transaction && <>
             <Text style={styles.description}>{transaction.description}</Text>
             <Text style={styles.date}>{`${dayjs(transaction.date).format('MMMM D, YYYY')} at ${dayjs(transaction.date).format('h:mm:ss a')}`}</Text>
-            <View>
+            <View style={styles.tagContainer}>
                 {props.tags.map((tag: Tag) => (
                     <View style={styles.tagWrapper} key={tag._id}>
                         <TouchableOpacity activeOpacity={0.5} onPress={() => onToggleTag(tag)}>
@@ -81,8 +81,16 @@ const styles = StyleSheet.create({
         color: Colours.text.lowlight,
         marginTop: 10
     },
+
+    tagContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between'
+    },
     
     tagWrapper: {
+        width: '48%',
         marginTop: 12
     },
 
