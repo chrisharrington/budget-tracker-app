@@ -6,7 +6,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { TabParamList, Transaction as TransactionModel } from '@lib/models';
 import { getAllowanceTransactions } from '@lib/data/allowances';
 import Colours from '@lib/colours';
-import { styles } from './style';
+import styles from './styles';
 
 type Props = BottomTabScreenProps<TabParamList, 'Quinn' | 'Zoe'>;
 

@@ -94,7 +94,6 @@ function TabBar(props: BottomTabBarProps) {
                 <Text
                     style={[styles.tabBarLabel, {
                         backgroundColor: isFocused ? Colours.background.positive : Colours.background.darker,
-                        color: isFocused ? Colours.text.dark : Colours.text.default
                     }]}
                     onPress={onPress}
                 >
