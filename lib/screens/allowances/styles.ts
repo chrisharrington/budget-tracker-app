@@ -8,20 +8,6 @@ export default StyleSheet.create({
         padding: 15
     },
 
-    loadingContainer: {
-        flex: 1,
-        alignContent: 'center',
-        justifyContent: 'center',
-        backgroundColor: Colours.background.default
-    },
-
-    error: {
-        flex: 1,
-        textAlign: 'center',
-        fontStyle: 'italic',
-        color: Colours.text.lowlight
-    },
-
     header: {
         flex: 1,
         flexDirection: 'row',

@@ -7,6 +7,8 @@ import { TabParamList, Transaction as TransactionModel } from '@lib/models';
 import { getAllowanceTransactions } from '@lib/data/allowances';
 import Colours from '@lib/colours';
 import styles from './styles';
+import { Loader } from '@lib/components/loader';
+import { Error } from '@lib/components/error';
 
 type Props = BottomTabScreenProps<TabParamList, 'Quinn' | 'Zoe'>;
 
@@ -16,19 +18,19 @@ export const ZoeAllowancesScreen = (props: Props) => <AllowancesScreen {...props
 const AllowancesScreen = ({ owner }: Props & { owner: string }) => {
     const [transactions, setTransactions] = useState<TransactionModel[]>([]),
         [loading, setLoading] = useState<boolean>(true),
-        [error, setError] = useState<boolean>(false),
+        [error, setError] = useState<Error | null>(null),
         total = useMemo(() => transactions.reduce((total, transaction) => total + (transaction.amount * (transaction.isAllowancePayment ? 1 : -1)), 0), [transactions]);
 
     useFocusEffect(useCallback(() => {
         console.log('focus', owner);
         (async () => {
             try {
-                setError(false);
+                setError(null);
                 setLoading(true);
                 setTransactions(await getAllowanceTransactions(owner));
             } catch (e) {
                 console.error(e);
-                setError(true);
+                setError(e as Error);
             } finally {
                 setLoading(false);
             }
@@ -36,21 +38,20 @@ const AllowancesScreen = ({ owner }: Props & { owner: string }) => {
     }, [owner]));
 
     if (loading)
-        return <View style={styles.loadingContainer}>
-            <ActivityIndicator size={48} color={Colours.text.positive} />
-        </View>;
+        return <Loader />;
+
+    if (error)
+        return <Error error={error} />;
 
     return <ScrollView style={styles.container}>
-        {error && <Text style={styles.error}>Unable to load allowance transactions</Text>}
-
-        {!loading && !error && <View>
+        <View>
             <View style={styles.header}>
                 <Text style={styles.headerOwner}>{`${owner[0].toUpperCase() + owner.slice(1)}'s Allowance`}</Text>
                 <Text style={styles.headerAmount}>{`$${total.toFixed(2)}`}</Text>
             </View>
 
             {transactions.map((transaction, index) => <Transaction key={index} transaction={transaction} />)}
-        </View>}
+        </View>
     </ScrollView>;
 }
 
