@@ -18,16 +18,17 @@ export default StyleSheet.create({
         flex: 2,
         fontFamily: 'Lato',
         fontSize: 22,
-        color: Colours.text.default,
-        // textTransform: 'uppercase'
+        color: Colours.text.default
     },
 
     headerAmount: {
+        flex: 1,
         fontFamily: 'Lato',
         fontSize: 22,
         color: Colours.text.default,
         textTransform: 'uppercase',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        textAlign: 'right'
     },
 
     transaction: {

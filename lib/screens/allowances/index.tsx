@@ -22,7 +22,6 @@ const AllowancesScreen = ({ owner }: Props & { owner: string }) => {
         total = useMemo(() => transactions.reduce((total, transaction) => total + (transaction.amount * (transaction.isAllowancePayment ? 1 : -1)), 0), [transactions]);
 
     useFocusEffect(useCallback(() => {
-        console.log('focus', owner);
         (async () => {
             try {
                 setError(null);
