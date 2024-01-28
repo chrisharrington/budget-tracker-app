@@ -10,6 +10,8 @@ import BudgetApi from '@lib/data/budget';
 import TagApi from '@lib/data/tag';
 import OneTimeApi from '@lib/data/one-time';
 import { StateContext } from '@lib/context';
+import { Loader } from '@lib/components/loader';
+import { Error } from '@lib/components/error';
 
 type Props = {
 }
@@ -56,16 +58,10 @@ export const TransactionsScreen = ({ }: Props) => {
     }, []);
 
     if (!budget || !oneTime || !tags)
-        return <View style={styles.loadingContainer}>
-            <ActivityIndicator size={48} color={Colours.button.positive} />
-        </View>
+        return <Loader />;
 
     if (error)
-        return <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>
-                {error.stack}
-            </Text>
-        </View>;
+        return <Error error={error} />;
 
     return <ScrollView
         style={styles.scrollContainer}
@@ -301,24 +297,5 @@ const styles = StyleSheet.create({
         marginTop: 20,
         marginHorizontal: 25,
         marginBottom: 5
-    },
-
-    errorContainer: {
-        flex: 1,
-        backgroundColor: Colours.background.error,
-        borderRadius: 5,
-        padding: 15,
-        paddingTop: 15 + (ReactStatusBar.currentHeight || 0)
-    },
-
-    errorText: {
-        color: Colours.text.default
-    },
-
-    loadingContainer: {
-        flex: 1,
-        alignContent: 'center',
-        justifyContent: 'center',
-        backgroundColor: Colours.background.default
     }
 });
