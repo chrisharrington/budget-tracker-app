@@ -23,7 +23,6 @@ export const Toast = React.forwardRef<ToastHandle>((_, ref) => {
 
     useImperativeHandle(ref, () => ({ clear, error, success }));
 
-    console.log('opacity', opacity.current);
     return <Animated.View style={[
         styles.container,
         { opacity: opacity.current, transform: [{ translateY: position.current }] }

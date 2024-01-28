@@ -6,7 +6,7 @@ export default class OneTimeApi {
     static async get() : Promise<OneTime> {
         const response = await fetch(`${Config.ApiUrl}/one-time/balance`, {
             headers: new Headers({
-                'Authorization': EXPO_PUBLIC_API_KEY
+                'Authorization': `Bearer ${EXPO_PUBLIC_API_KEY}`
             })
         });
 

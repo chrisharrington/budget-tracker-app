@@ -7,7 +7,7 @@ export default class DeviceApi {
             method: 'POST',
             body: JSON.stringify({ token }),
             headers: new Headers({
-                'Authorization': EXPO_PUBLIC_API_KEY,
+                'Authorization': `Bearer ${EXPO_PUBLIC_API_KEY}`,
                 'Content-Type': 'application/json'
             })
         });
