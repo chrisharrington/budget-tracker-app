@@ -11,6 +11,7 @@
     "log": "npx react-native log-android"
   },
   "dependencies": {
+    "@react-native-community/masked-view": "^0.1.11",
     "@react-navigation/bottom-tabs": "^6.5.11",
     "@react-navigation/native": "^6.1.9",
     "babel-plugin-module-resolver": "^5.0.0",
@@ -24,7 +25,10 @@
     "react-dom": "18.2.0",
     "react-native": "0.73.2",
     "react-native-circular-progress": "^1.3.9",
+    "react-native-gesture-handler": "^2.14.1",
     "react-native-modal": "^13.0.1",
+    "react-native-safe-area-context": "^4.8.2",
+    "react-native-screens": "^3.29.0",
     "react-native-svg": "14.1.0",
     "typescript": "^5.1.3"
   },
