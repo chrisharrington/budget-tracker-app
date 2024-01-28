@@ -52,7 +52,7 @@ export const TransactionsScreen = ({ }: Props) => {
                 });
             } catch (e) {
                 console.error(e);
-                toast.error('An error has occurred while retrieving the list of transactions. Please contact your local husband.');
+                setError(e as Error);
             }
         })();
     }, []);
@@ -124,7 +124,7 @@ export const TransactionsScreen = ({ }: Props) => {
             dateRef.current = budget.date;
         } catch (e) {
             console.error(e);
-            toast.error('An error has occurred while retrieving the budget. Please try again later.');
+            setError(e as Error);
         }
     }
 
@@ -134,7 +134,7 @@ export const TransactionsScreen = ({ }: Props) => {
             setTags(tags);
         } catch (e) {
             console.error(e);
-            toast.error('An error has occurred while retrieving the list of tags. Please try again later.');
+            setError(e as Error);
         }
     }
 
@@ -144,7 +144,7 @@ export const TransactionsScreen = ({ }: Props) => {
             setOneTime(oneTime);
         } catch (e) {
             console.error(e);
-            toast.error('An error has occurred while retrieving the one-time balance. Please try again later.');
+            setError(e as Error);
         }
     }
 

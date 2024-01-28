@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { View, Text, ActivityIndicator, ScrollView } from 'react-native';
 import dayjs from 'dayjs';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
@@ -19,21 +19,21 @@ const AllowancesScreen = ({ owner }: Props & { owner: string }) => {
         [error, setError] = useState<boolean>(false),
         total = useMemo(() => transactions.reduce((total, transaction) => total + (transaction.amount * (transaction.isAllowancePayment ? 1 : -1)), 0), [transactions]);
 
-    useFocusEffect(() => {
+    useFocusEffect(useCallback(() => {
         console.log('focus', owner);
-        // (async () => {
-        //     try {
-        //         setError(false);
-        //         setLoading(true);
-        //         setTransactions(await getAllowanceTransactions(owner));
-        //     } catch (e) {
-        //         console.error(e);
-        //         setError(true);
-        //     } finally {
-        //         setLoading(false);
-        //     }
-        // })();
-    });
+        (async () => {
+            try {
+                setError(false);
+                setLoading(true);
+                setTransactions(await getAllowanceTransactions(owner));
+            } catch (e) {
+                console.error(e);
+                setError(true);
+            } finally {
+                setLoading(false);
+            }
+        })();
+    }, [owner]));
 
     if (loading)
         return <View style={styles.loadingContainer}>
