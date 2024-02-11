@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: Colours.background.default,
         flexDirection: 'column',
-        paddingTop: ReactStatusBar.currentHeight
+        // paddingTop: ReactStatusBar.currentHeight
     },
 
     tabBar: {
