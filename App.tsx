@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import { StyleSheet, View, StatusBar as ReactStatusBar, LogBox, Text } from 'react-native';
+import { StyleSheet, View, LogBox, Text } from 'react-native';
 import * as Notifications from 'expo-notifications';
-import { Ionicons, FontAwesome } from '@expo/vector-icons'
 import * as Font from 'expo-font';
 import Constants from 'expo-constants';
 import { NavigationContainer } from '@react-navigation/native';
@@ -109,7 +108,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: Colours.background.default,
         flexDirection: 'column',
-        // paddingTop: ReactStatusBar.currentHeight
+        paddingTop: Constants.statusBarHeight
     },
 
     tabBar: {
