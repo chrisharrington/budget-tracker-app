@@ -1,3 +1,5 @@
+import 'react-native-gesture-handler';
+
 import React, { useEffect, useRef } from 'react';
 import { StyleSheet, View, LogBox, Text } from 'react-native';
 import * as Notifications from 'expo-notifications';
@@ -17,7 +19,7 @@ LogBox.ignoreLogs(['new NativeEventEmitter()']);
 
 const Tab = createBottomTabNavigator<TabParamList>();
 
-export default () => {
+export default function App() {
     const toast = useRef<ToastHandle>(null);
 
     useEffect(() => {
@@ -51,6 +53,7 @@ export default () => {
         <Toast ref={toast} />
 
         <StateContext.Provider value={{ toast: toast.current as ToastHandle }}>
+            <Text>Hello2!</Text>
             <NavigationContainer>
                 <Tab.Navigator
                     initialRouteName='Transactions'
