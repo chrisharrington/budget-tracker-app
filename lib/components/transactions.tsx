@@ -7,6 +7,12 @@ import Colours from '../colours';
 import { TransactionDetailsModal } from './transaction-details-modal';
 import { TransactionSplitModal } from './transaction-split-modal';
 
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc);
+
+import weekday from 'dayjs/plugin/weekday';
+dayjs.extend(weekday);
+
 dayjs.extend(timezone);
 
 type Props = {
@@ -60,7 +66,10 @@ export const Transactions = (props: Props) => {
     }
 
     const canEdit = (transaction: Transaction) : boolean => {
-        const startOfPreviousWeek = dayjs().startOf('week').add(1, 'day').subtract(1, 'week');
+        // const startOfPreviousWeek = dayjs.utc().startOf('week').add(1, 'day').subtract(1, 'week');
+        let startOfPreviousWeek = dayjs().startOf('day').subtract(1, 'week');
+        while (startOfPreviousWeek.day() !== 1)
+            startOfPreviousWeek = startOfPreviousWeek.subtract(1, 'day');
         return dayjs(transaction.date).isAfter(startOfPreviousWeek);
     }
 
