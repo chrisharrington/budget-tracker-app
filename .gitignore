@@ -104,4 +104,4 @@ dist
 .tern-port
 
 # Local Expo configuration
-.expo
+.expo/
