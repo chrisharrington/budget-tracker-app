@@ -1,8 +1,8 @@
-import { createContext } from 'react';
+import { RefObject, createContext } from 'react';
 import { ToastHandle } from './components/toast';
 
 export type State = {
-    toast: ToastHandle;
+    toast: RefObject<ToastHandle>;
 }
 
 export const StateContext = createContext<State>({} as State);

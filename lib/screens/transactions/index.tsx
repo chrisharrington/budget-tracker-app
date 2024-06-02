@@ -109,7 +109,7 @@ export const TransactionsScreen = ({ }: Props) => {
             transactions={transactions.filter(t => !t.balance)}
             tags={tags}
             onChange={(transaction: Transaction) => onTransactionChanged(transaction)}
-            onError={(message: string) => toast.error(message)}
+            onError={(message: string) => toast.current?.error(message)}
             onRefresh={() => getBudget(budget?.date)}
         />
     </ScrollView>;
@@ -180,7 +180,7 @@ export const TransactionsScreen = ({ }: Props) => {
             await getOneTimeBalance();
         } catch (e) {
             console.error(e);
-            toast.error('An error has occurred while updating the transaction. Please try again later.');
+            toast.current?.error('An error has occurred while updating the transaction. Please try again later.');
             setBudget(budget);
         }
     }

@@ -1,3 +1,4 @@
+import 'expo-dev-client';
 import 'react-native-gesture-handler';
 
 import React, { useEffect, useRef } from 'react';
@@ -52,8 +53,7 @@ export default function App() {
     return <View style={styles.container}>
         <Toast ref={toast} />
 
-        <StateContext.Provider value={{ toast: toast.current as ToastHandle }}>
-            <Text>Hello2!</Text>
+        <StateContext.Provider value={{ toast }}>
             <NavigationContainer>
                 <Tab.Navigator
                     initialRouteName='Transactions'

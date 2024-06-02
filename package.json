@@ -3,12 +3,10 @@
   "version": "1.0.0",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web",
-    "build:remote": "eas build -p android --profile production --clear-cache",
-    "log": "npx react-native log-android"
+    "start": "bunx expo start --dev-client",
+    "build": "eas build --profile development --platform android --local",
+    "build:remote": "bunx eas build -p android --profile production --clear-cache",
+    "log": "bunx react-native log-android"
   },
   "dependencies": {
     "@react-native-community/masked-view": "^0.1.11",
@@ -18,6 +16,7 @@
     "dayjs": "^1.11.9",
     "expo": "~50.0.19",
     "expo-constants": "~15.4.6",
+    "expo-dev-client": "~3.3.12",
     "expo-notifications": "~0.27.7",
     "expo-splash-screen": "~0.26.5",
     "expo-status-bar": "~1.11.1",
