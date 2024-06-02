@@ -66,7 +66,6 @@ export const Transactions = (props: Props) => {
     }
 
     const canEdit = (transaction: Transaction) : boolean => {
-        // const startOfPreviousWeek = dayjs.utc().startOf('week').add(1, 'day').subtract(1, 'week');
         let startOfPreviousWeek = dayjs().startOf('day').subtract(1, 'week');
         while (startOfPreviousWeek.day() !== 1)
             startOfPreviousWeek = startOfPreviousWeek.subtract(1, 'day');
