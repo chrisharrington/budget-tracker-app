@@ -15,6 +15,7 @@ import { TransactionsScreen } from '@lib/screens/transactions';
 import { StateContext } from '@lib/context';
 import { QuinnAllowancesScreen, ZoeAllowancesScreen } from '@lib/screens/allowances';
 import { TabParamList } from '@lib/models';
+import { StatusBar } from 'expo-status-bar';
 
 LogBox.ignoreLogs(['new NativeEventEmitter()']);
 
@@ -51,6 +52,7 @@ export default function App() {
     }, []);
 
     return <View style={styles.container}>
+        <StatusBar backgroundColor='#2a2a2a' style='light' />
         <Toast ref={toast} />
 
         <StateContext.Provider value={{ toast }}>

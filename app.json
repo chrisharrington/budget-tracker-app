@@ -25,10 +25,6 @@
                 "backgroundColor": "#059C6B"
             }
         },
-        "androidStatusBar": {
-            "barStyle": "light-content",
-            "backgroundColor": "#2a2a2a"
-        },
         "notification": {
             "icon": "./assets/status-bar-icon.png",
             "color": "#D5B80C"

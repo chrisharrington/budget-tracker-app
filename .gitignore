@@ -105,3 +105,7 @@ dist
 
 # Local Expo configuration
 .expo/
+
+# Expo builds
+dev-build.apk
+prod-build.apk

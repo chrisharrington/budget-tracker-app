@@ -4,8 +4,9 @@
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "bunx expo start --dev-client",
-    "build": "eas build --profile development --platform android --local",
-    "build:remote": "bunx eas build -p android --profile production --clear-cache",
+    "build:dev": "dotenv -- eas build --profile development --platform android --local --output dev-build.apk",
+    "build:prod": "dotenv -- eas build --profile production --platform android --local --output prod-build.apk",
+    "build:prod:remote": "eas build -p android --profile production --clear-cache",
     "log": "bunx react-native log-android"
   },
   "dependencies": {
