@@ -109,3 +109,7 @@ dist
 # Expo builds
 dev-build.apk
 prod-build.apk
+
+# Google Services
+google-services.json
+budget-tracker-firebase.json
