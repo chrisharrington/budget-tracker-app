@@ -1,14 +1,11 @@
 import 'expo-dev-client';
 import 'react-native-gesture-handler';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import { StyleSheet, View, LogBox, Text } from 'react-native';
-import * as Notifications from 'expo-notifications';
-import * as Font from 'expo-font';
 import Constants from 'expo-constants';
 import { NavigationContainer } from '@react-navigation/native';
 import { BottomTabBarProps, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import DeviceApi from './lib/data/device';
 import Colours from './lib/colours';
 import { Toast, ToastHandle } from './lib/components/toast';
 import { TransactionsScreen } from '@lib/screens/transactions';
@@ -16,6 +13,8 @@ import { StateContext } from '@lib/context';
 import { QuinnAllowancesScreen, ZoeAllowancesScreen } from '@lib/screens/allowances';
 import { TabParamList } from '@lib/models';
 import { StatusBar } from 'expo-status-bar';
+import { useNotifications } from '@lib/hooks/notifications';
+import { useFonts } from '@lib/hooks/fonts';
 
 LogBox.ignoreLogs(['new NativeEventEmitter()']);
 
@@ -24,32 +23,8 @@ const Tab = createBottomTabNavigator<TabParamList>();
 export default function App() {
     const toast = useRef<ToastHandle>(null);
 
-    useEffect(() => {
-        (async () => {
-            try {
-                if (!__DEV__) {
-                    let { granted } = await Notifications.getPermissionsAsync();
-                    if (!granted)
-                        granted = (await Notifications.requestPermissionsAsync()).granted;
-
-                    if (granted) {
-                        const token = await Notifications.getExpoPushTokenAsync({
-                            projectId: Constants.expoConfig?.extra?.eas.projectId
-                        });
-                        await DeviceApi.registerToken(token.data);
-                    } else
-                        console.error('Notifications permission not granted.');
-                }
-
-                await Font.loadAsync({
-                    'Lato': require('./assets/Lato-Regular.ttf')
-                });
-            } catch (e) {
-                console.error(e);
-                toast.current?.error('An error has occurred while initializing the application. Please try again later.');
-            }
-        })();
-    }, []);
+    useNotifications();
+    useFonts();
 
     return <View style={styles.container}>
         <StatusBar backgroundColor='#2a2a2a' style='light' />
