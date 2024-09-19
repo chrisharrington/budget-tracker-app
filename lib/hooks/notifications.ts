@@ -7,19 +7,25 @@ export function useNotifications() {
     useEffect(() => {
         (async () => {
             try {
-                if (!__DEV__) {
-                    let { granted } = await getPermissionsAsync();
-                    if (!granted)
-                        granted = (await requestPermissionsAsync()).granted;
+                console.log('Checking notification permissions...');
 
-                    if (granted) {
-                        const token = await getExpoPushTokenAsync({
-                            projectId: Constants.expoConfig?.extra?.eas.projectId
-                        });
-                        await DeviceApi.registerToken(token.data);
-                    } else
-                        console.error('Notifications permission not granted.');
+                let { granted } = await getPermissionsAsync();
+                if (!granted) {
+                    console.log('Requesting notification permissions...');
+                    granted = (await requestPermissionsAsync()).granted;
                 }
+
+                console.log('Notification permissions:', granted);
+
+                if (granted) {
+                    console.log('Registering for notifications...');
+                    const token = await getExpoPushTokenAsync({
+                        projectId: Constants.expoConfig?.extra?.eas.projectId
+                    });
+                    console.log('Notification token:', token.data);
+                    await DeviceApi.registerToken(token.data);
+                } else
+                    console.error('Notifications permission not granted.');
             } catch (e) {
                 console.error(e);
             }
