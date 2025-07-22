@@ -1,0 +1,47 @@
+export default {
+    expo: {
+        name: "Budget Tracker",
+        slug: "budget-tracker-app",
+        version: "1.0.0",
+        orientation: "portrait",
+        userInterfaceStyle: "dark",
+        splash: {
+            image: "./assets/splash.png",
+            resizeMode: "contain",
+            backgroundColor: "#333333"
+        },
+        assetBundlePatterns: [
+            "**/*"
+        ],
+        ios: {
+            supportsTablet: true
+        },
+        android: {
+            package: "com.budgettracker.app",
+            versionCode: 1,
+            googleServicesFile: process.env.GOOGLE_SERVICES_JSON ?? "./google-services.json",
+            adaptiveIcon: {
+                foregroundImage: "./assets/icon-foreground.png",
+                backgroundColor: "#059C6B"
+            }
+        },
+        notification: {
+            icon: "./assets/status-bar-icon.png",
+            color: "#D5B80C"
+        },
+        web: {
+            favicon: "./assets/favicon.png"
+        },
+        extra: {
+            eas: {
+                projectId: "160e6714-0a9e-4efa-9f13-cbde6800ec70"
+            }
+        },
+        runtimeVersion: {
+            policy: "appVersion"
+        },
+        updates: {
+            url: "https://u.expo.dev/160e6714-0a9e-4efa-9f13-cbde6800ec70"
+        }
+    }
+};

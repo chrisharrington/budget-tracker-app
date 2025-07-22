@@ -7,7 +7,10 @@
       "developmentClient": true,
       "distribution": "internal",
       "bun": "1.0.12",
-      "channel": "development"
+      "channel": "development",
+      "env": {
+        "GOOGLE_SERVICES_JSON": "./google-services.json"
+      }
     },
     "preview": {
       "distribution": "internal",
