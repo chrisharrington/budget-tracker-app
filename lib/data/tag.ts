@@ -3,16 +3,21 @@ import { Tag } from '../models';
 import Config from '../config';
 
 export default class TagApi {
-    static async get() : Promise<Tag[]> {
-        const response = await fetch(`${Config.ApiUrl}/tags/recent`, {
-            headers: new Headers({
-                'Authorization': `Bearer ${EXPO_PUBLIC_API_KEY}`
-            })
-        });
+    static async get(): Promise<Tag[]> {
+        try {
+            const response = await fetch(`${Config.ApiUrl}/tags/recent`, {
+                headers: new Headers({
+                    'Authorization': `Bearer ${EXPO_PUBLIC_API_KEY}`
+                })
+            });
 
-        if (response.status !== 200)
-            throw new Error(`Error while retreiving recent tags. ${response.status}`);
+            if (response.status !== 200)
+                throw new Error(`Error while retreiving recent tags. ${response.status}`);
 
-        return await response.json();
+            return await response.json();
+        } catch (e) {
+            console.error('Error fetching tags.', e);
+            throw e;
+        }
     }
 }

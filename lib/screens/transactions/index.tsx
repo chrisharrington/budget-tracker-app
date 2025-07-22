@@ -36,25 +36,20 @@ export const TransactionsScreen = ({ }: Props) => {
 
     useEffect(() => {
         (async () => {
-            try {
-                await Promise.all([
-                    getBudget(),
-                    getTags(),
-                    getOneTimeBalance()
-                ]);
+            await Promise.all([
+                getBudget(),
+                getTags(),
+                getOneTimeBalance()
+            ]);
 
-                AppState.addEventListener('change', async (nextState: AppStateStatus) => {
-                    setAppState(prevAppState => {
-                        if (prevAppState.match(/background|inactive/) && nextState === 'active')
-                            getBudget();
+            AppState.addEventListener('change', async (nextState: AppStateStatus) => {
+                setAppState(prevAppState => {
+                    if (prevAppState.match(/background|inactive/) && nextState === 'active')
+                        getBudget();
 
-                        return AppState.currentState;
-                    });
+                    return AppState.currentState;
                 });
-            } catch (e) {
-                console.error(e);
-                setError(e as Error);
-            }
+            });
         })();
     }, []);
 

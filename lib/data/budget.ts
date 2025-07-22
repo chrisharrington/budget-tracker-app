@@ -3,53 +3,73 @@ import { Budget, Transaction, History } from '../models';
 import Config from '../config';
 
 export default class BudgetApi {
-    static async get(date: Date) : Promise<{ budget: Budget, transactions: Transaction[] }> {
-        const response = await fetch(`${Config.ApiUrl}/week?date=${dayjs(date).format()}`);
+    static async get(date: Date): Promise<{ budget: Budget, transactions: Transaction[] }> {
+        try {
+            const response = await fetch(`${Config.ApiUrl}/week?date=${dayjs(date).format()}`);
 
-        if (!response.ok)
-            throw new Error(`Error while retreiving budget. ${response.status}`);
+            if (!response.ok)
+                throw new Error(`Error while retrieving budget. ${response.status}`);
 
-        const result = await response.json();
-        const { transactions, ...budget } = result;
-        transactions.forEach(t => t.tags = t.tags || []);
-        return { transactions, budget };
+            const result = await response.json();
+            const { transactions, ...budget } = result;
+            transactions.forEach(t => t.tags = t.tags || []);
+            return { transactions, budget };
+        } catch (e) {
+            console.error('Error fetching budget.', e);
+            throw e;
+        }
     }
 
-    static async history() : Promise<History[]> {
-        const response = await fetch(`${Config.ApiUrl}/history`);
+    static async history(): Promise<History[]> {
+        try {
+            const response = await fetch(`${Config.ApiUrl}/history`);
 
-        if (!response.ok)
-            throw new Error(`Error while retrieving history. ${response.status}`);
+            if (!response.ok)
+                throw new Error(`Error while retrieving history. ${response.status}`);
 
-        return await response.json();
+            return await response.json();
+        } catch (e) {
+            console.error('Error fetching history.', e);
+            throw e;
+        }
     }
 
-    static async updateTransaction(transaction: Transaction) : Promise<void> {
-        const response = await fetch(`${Config.ApiUrl}/transaction`, {
-            method: 'POST',
-            body: JSON.stringify(transaction),
-            headers: new Headers({
-                'Content-Type': 'application/json'
-            })
-        });
+    static async updateTransaction(transaction: Transaction): Promise<void> {
+        try {
+            const response = await fetch(`${Config.ApiUrl}/transaction`, {
+                method: 'POST',
+                body: JSON.stringify(transaction),
+                headers: new Headers({
+                    'Content-Type': 'application/json'
+                })
+            });
 
-        if (!response.ok)
-            throw new Error(`Error while updating transaction. ${response.status}`);
+            if (!response.ok)
+                throw new Error(`Error while updating transaction. ${response.status}`);
+        } catch (e) {
+            console.error('Error updating transaction.', e);
+            throw e;
+        }
     }
 
     static async splitTransaction(transaction: Transaction, newAmount: number) {
-        const response = await fetch(`${Config.ApiUrl}/transaction/split`, {
-            method: 'POST',
-            body: JSON.stringify({
-                transaction,
-                newAmount
-            }),
-            headers: new Headers({
-                'Content-Type': 'application/json'
-            })
-        });
+        try {
+            const response = await fetch(`${Config.ApiUrl}/transaction/split`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    transaction,
+                    newAmount
+                }),
+                headers: new Headers({
+                    'Content-Type': 'application/json'
+                })
+            });
 
-        if (!response.ok)
-            throw new Error(`Error while splitting transaction. ${response.status}`);
+            if (!response.ok)
+                throw new Error(`Error while splitting transaction. ${response.status}`);
+        } catch (e) {
+            console.error('Error splitting transaction.', e);
+            throw e;
+        }
     }
 }

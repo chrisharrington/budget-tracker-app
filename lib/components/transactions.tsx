@@ -27,32 +27,34 @@ export const Transactions = (props: Props) => {
     const [detailsTransaction, setDetailsTransaction] = React.useState<Transaction | null>(null);
     const [splitTransaction, setSplitTransaction] = React.useState<Transaction | null>(null);
 
-    const renderTransaction = (transaction: Transaction, index: number) => {
-        return <TouchableOpacity
-            onPress={() => !transaction.balance && onPress(transaction)}
-            onLongPress={() => !transaction.balance && onLongPress(transaction)}
-            activeOpacity={0.8}
-            key={transaction.description + index}
-        >
-            <View style={[styles.transaction, transaction.ignored || transaction.balance || (transaction.tags || []).some(t => t.ignore) ? styles.transactionIgnored : null]}>
-                <View style={[styles.transactionOwner, { backgroundColor: transaction.owner === 'Chris' ? Colours.chris : Colours.sarah }]}></View>
-                <View style={styles.transactionDetails}>
-                    <Text style={styles.transactionDate}>{dayjs(transaction.date).format('MM/DD')}</Text>
-                    <Text style={styles.transactionDescription}>{transaction.description}</Text>
-                    <Text style={styles.transactionAmount}>{`$${transaction.amount.toFixed(2)}`}</Text>
+    function renderTransaction(transaction: Transaction, index: number) {
+        return (
+            <TouchableOpacity
+                onPress={() => !transaction.balance && onPress(transaction)}
+                onLongPress={() => !transaction.balance && onLongPress(transaction)}
+                activeOpacity={0.8}
+                key={transaction.description + index}
+            >
+                <View style={[styles.transaction, transaction.ignored || transaction.balance || (transaction.tags || []).some(t => t.ignore) ? styles.transactionIgnored : null]}>
+                    <View style={[styles.transactionOwner, { backgroundColor: transaction.owner === 'Chris' ? Colours.chris : Colours.sarah }]}></View>
+                    <View style={styles.transactionDetails}>
+                        <Text style={styles.transactionDate}>{dayjs(transaction.date).format('MM/DD')}</Text>
+                        <Text style={styles.transactionDescription}>{transaction.description}</Text>
+                        <Text style={styles.transactionAmount}>{`$${transaction.amount.toFixed(2)}`}</Text>
+                    </View>
                 </View>
-            </View>
-        </TouchableOpacity>;
+            </TouchableOpacity>
+        );
     }
 
-    const onPress = (transaction: Transaction) => {
+    function onPress(transaction: Transaction) {
         if (canEdit(transaction))
             setDetailsTransaction(transaction);
         else
             props.onError('Unable to edit transaction because it occurred too long ago.');
     }
 
-    const onLongPress = (transaction: Transaction) => {
+    function onLongPress(transaction: Transaction) {
         if (canEdit(transaction)) {
             Vibration.vibrate(10);
             setSplitTransaction(transaction);
@@ -60,12 +62,12 @@ export const Transactions = (props: Props) => {
             props.onError('Unable to edit transaction because it occurred too long ago.');
     }
 
-    const onTransactionSplit = () => {
+    function onTransactionSplit() {
         setSplitTransaction(null);
         props.onRefresh();
     }
 
-    const canEdit = (transaction: Transaction) : boolean => {
+    function canEdit(transaction: Transaction): boolean {
         let startOfPreviousWeek = dayjs().startOf('day').subtract(1, 'week');
         while (startOfPreviousWeek.day() !== 1)
             startOfPreviousWeek = startOfPreviousWeek.subtract(1, 'day');
@@ -121,7 +123,7 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row'
     },
-    
+
     transactionOwner: {
         position: 'absolute',
         width: 16,

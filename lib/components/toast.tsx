@@ -19,7 +19,7 @@ export const Toast = React.forwardRef<ToastHandle>((_, ref) => {
         position = useRef<Animated.Value>(new Animated.Value(25)),
         [message, setMessage] = useState<string>(''),
         [type, setType] = useState<ToastType>(ToastType.Success),
-        timeout = useRef<any>();
+        timeout = useRef<any>(null);
 
     useImperativeHandle(ref, () => ({ clear, error, success }));
 

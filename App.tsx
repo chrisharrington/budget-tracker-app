@@ -32,54 +32,9 @@ export default function App() {
 
         <StateContext.Provider value={{ toast }}>
             <NavigationContainer>
-                <Tab.Navigator
-                    initialRouteName='Transactions'
-                    tabBar={props => <TabBar {...props} />}
-                    screenOptions={{
-                        headerShown: false
-                    }}
-                >
-                    <Tab.Screen
-                        name='Transactions'
-                        component={TransactionsScreen}
-                    />
-
-                    <Tab.Screen
-                        name='Quinn'
-                        component={QuinnAllowancesScreen}
-                    />
-
-                    <Tab.Screen
-                        name='Zoe'
-                        component={ZoeAllowancesScreen}
-                    />
-                </Tab.Navigator>
+                <TransactionsScreen />
             </NavigationContainer>
         </StateContext.Provider>
-    </View>;
-}
-
-function TabBar(props: BottomTabBarProps) {
-    return <View style={styles.tabBar}>
-        {props.state.routes.map((route, index) => {
-            const isFocused = props.state.index === index;
-
-            const onPress = () => {
-                if (!isFocused)
-                    props.navigation.navigate(route.name);
-            };
-
-            return <View key={route.key} style={styles.tabBarLabelWrapper}>
-                <Text
-                    style={[styles.tabBarLabel, {
-                        backgroundColor: isFocused ? Colours.background.positive : Colours.background.darker,
-                    }]}
-                    onPress={onPress}
-                >
-                    {route.name}
-                </Text>
-            </View>;
-        })}
     </View>;
 }
 

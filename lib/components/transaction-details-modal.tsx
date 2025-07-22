@@ -18,7 +18,7 @@ export const TransactionDetailsModal = (props: Props) => {
 
     React.useEffect(() => {
         const newTransaction = props.transaction;
-        if (newTransaction && (!transaction || transaction.amount !== newTransaction.amount)) {
+        if (newTransaction && (!transaction || transaction._id !== newTransaction._id)) {
             setTransaction(newTransaction);
             setSelectedTags(newTransaction.tags || []);
         }
