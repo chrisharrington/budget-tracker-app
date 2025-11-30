@@ -5,6 +5,7 @@ import { Transaction } from '../models';
 import Colours from '../colours';
 import BudgetApi from '../data/budget';
 import { Modal } from './modal';
+import { log } from '@lib/helpers/log';
 
 type Props = {
     transaction: Transaction | null;
@@ -51,7 +52,7 @@ export const TransactionSplitModal = (props: Props) => {
             await BudgetApi.splitTransaction(transaction, secondAmountValue);
             props.onSplit();
         } catch (e) {
-            console.error(e);
+            log('Error splitting transaction.', e);
             props.onError('An error has occurred while splitting this transaction. Please try again later.');
         }
     }

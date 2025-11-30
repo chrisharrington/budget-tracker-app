@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import { Budget, Transaction, History } from '../models';
 import Config from '../config';
+import { log } from '@lib/helpers/log';
 
 export default class BudgetApi {
     static async get(date: Date): Promise<{ budget: Budget, transactions: Transaction[] }> {
@@ -15,7 +16,7 @@ export default class BudgetApi {
             transactions.forEach(t => t.tags = t.tags || []);
             return { transactions, budget };
         } catch (e) {
-            console.error('Error fetching budget.', e);
+            log('Error fetching budget.', e);
             throw e;
         }
     }
@@ -29,7 +30,7 @@ export default class BudgetApi {
 
             return await response.json();
         } catch (e) {
-            console.error('Error fetching history.', e);
+            log('Error fetching history.', e);
             throw e;
         }
     }
@@ -47,7 +48,7 @@ export default class BudgetApi {
             if (!response.ok)
                 throw new Error(`Error while updating transaction. ${response.status}`);
         } catch (e) {
-            console.error('Error updating transaction.', e);
+            log('Error updating transaction.', e);
             throw e;
         }
     }
@@ -68,7 +69,7 @@ export default class BudgetApi {
             if (!response.ok)
                 throw new Error(`Error while splitting transaction. ${response.status}`);
         } catch (e) {
-            console.error('Error splitting transaction.', e);
+            log('Error splitting transaction.', e);
             throw e;
         }
     }

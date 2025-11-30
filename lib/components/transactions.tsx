@@ -85,6 +85,7 @@ export const Transactions = (props: Props) => {
             tags={props.tags}
             onClose={() => setDetailsTransaction(null)}
             onChange={(transaction: Transaction) => props.onChange(transaction)}
+            onError={(message: string) => props.onError(message)}
         />
 
         <TransactionSplitModal

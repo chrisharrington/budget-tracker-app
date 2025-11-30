@@ -1,6 +1,7 @@
 import { EXPO_PUBLIC_API_KEY } from '@env';
 import { OneTime } from '../models';
 import Config from '../config';
+import { log } from '@lib/helpers/log';
 
 export default class OneTimeApi {
     static async get(): Promise<OneTime> {
@@ -16,7 +17,7 @@ export default class OneTimeApi {
 
             return await response.json();
         } catch (e) {
-            console.error('Error fetching one-time balance.', e);
+            log('Error fetching one-time balance.', e);
             throw e;
         }
     }

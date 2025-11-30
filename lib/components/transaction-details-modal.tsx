@@ -4,12 +4,14 @@ import dayjs from 'dayjs';
 import { Tag, Transaction } from '../models';
 import Colours from '../colours';
 import { Modal } from './modal';
+import { log } from '@lib/helpers/log';
 
 type Props = {
     transaction: Transaction | null;
     tags: Tag[];
     onClose: () => void;
     onChange: (transaction: Transaction) => void;
+    onError: (message: string) => void;
 }
 
 export const TransactionDetailsModal = (props: Props) => {
@@ -32,7 +34,8 @@ export const TransactionDetailsModal = (props: Props) => {
                 props.onClose();
             }
         } catch (e) {
-            console.error(e);
+            log('Error saving transaction details.', e);
+            props.onError('An error occurred while saving the transaction details. Please try again later.');
         }
     }
 

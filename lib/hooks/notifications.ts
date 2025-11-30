@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { getPermissionsAsync, requestPermissionsAsync, getExpoPushTokenAsync } from 'expo-notifications';
 import Constants from 'expo-constants';
 import DeviceApi from '@lib/data/device';
+import { log } from '@lib/helpers/log';
 
 export function useNotifications() {
     useEffect(() => {
@@ -25,9 +26,9 @@ export function useNotifications() {
                     console.log('Notification token:', token.data);
                     await DeviceApi.registerToken(token.data);
                 } else
-                    console.error('Notifications permission not granted.');
+                    log('Notifications permission not granted.');
             } catch (e) {
-                console.error(e);
+                log('Error setting up notifications.', e);
             }
         })();
     })

@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { loadAsync } from 'expo-font';
+import { log } from '@lib/helpers/log';
 
 export function useFonts() {
     useEffect(() => {
@@ -9,7 +10,7 @@ export function useFonts() {
                     'Lato': require('@assets/Lato-Regular.ttf')
                 });
             } catch (e) {
-                console.error(e);
+                log('Error loading fonts.', e);
             }
         })();
     }, []);

@@ -13,6 +13,7 @@ import { StateContext } from '@lib/context';
 import { Loader } from '@lib/components/loader';
 import { Error } from '@lib/components/error';
 import styles from './styles';
+import { log } from '@lib/helpers/log';
 
 type Props = {
 }
@@ -25,17 +26,17 @@ export const TransactionsScreen = ({ }: Props) => {
         [error, setError] = useState<Error | null>(null),
         [_, setAppState] = useState<AppStateStatus>(AppState.currentState),
         { toast } = useContext(StateContext),
-
         dateRef = useRef<Date>(dayjs().toDate());
 
     const amount = useMemo(() => (budget?.weeklyAmount || 0) - transactions.filter(transaction => !transaction.ignored && (transaction.tags || []).every(tag => !tag.ignore))
         .map(b => b.amount)
         .reduce((sum, amount) => sum + amount, 0), [budget, transactions]);
 
-    const balance = budget?.balance || 0;
+    const balance = useMemo(() => budget?.balance || 0, [budget]);
 
     useEffect(() => {
         (async () => {
+            try {
             await Promise.all([
                 getBudget(),
                 getTags(),
@@ -50,14 +51,17 @@ export const TransactionsScreen = ({ }: Props) => {
                     return AppState.currentState;
                 });
             });
+        } catch (e) {
+            setError(e as Error);
+        }
         })();
     }, []);
 
-    if (!budget || !oneTime || !tags)
-        return <Loader />;
-
     if (error)
         return <Error error={error} />;
+
+    if (!budget || !oneTime || !tags)
+        return <Loader />;
 
     return <ScrollView
         style={styles.scrollContainer}
@@ -119,7 +123,7 @@ export const TransactionsScreen = ({ }: Props) => {
             setTransactions(transactions.sort((first, second) => dayjs(second.date).valueOf() - dayjs(first.date).valueOf()));
             dateRef.current = budget.date;
         } catch (e) {
-            console.error(e);
+            log('Error fetching budget.', e);
             setError(e as Error);
         }
     }
@@ -129,7 +133,7 @@ export const TransactionsScreen = ({ }: Props) => {
             const tags = await TagApi.get();
             setTags(tags);
         } catch (e) {
-            console.error(e);
+            log('Error fetching tags.', e);
             setError(e as Error);
         }
     }
@@ -139,7 +143,7 @@ export const TransactionsScreen = ({ }: Props) => {
             const oneTime = await OneTimeApi.get();
             setOneTime(oneTime);
         } catch (e) {
-            console.error(e);
+            log('Error fetching one-time balance.', e);
             setError(e as Error);
         }
     }
@@ -174,7 +178,7 @@ export const TransactionsScreen = ({ }: Props) => {
             await BudgetApi.updateTransaction(changed);
             await getOneTimeBalance();
         } catch (e) {
-            console.error(e);
+            log('Error updating transaction.', e);
             toast.current?.error('An error has occurred while updating the transaction. Please try again later.');
             setBudget(budget);
         }

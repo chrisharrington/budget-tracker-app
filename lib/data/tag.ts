@@ -1,6 +1,7 @@
 import { EXPO_PUBLIC_API_KEY } from '@env';
 import { Tag } from '../models';
 import Config from '../config';
+import { log } from '@lib/helpers/log';
 
 export default class TagApi {
     static async get(): Promise<Tag[]> {
@@ -16,7 +17,7 @@ export default class TagApi {
 
             return await response.json();
         } catch (e) {
-            console.error('Error fetching tags.', e);
+            log('Error fetching tags.', e);
             throw e;
         }
     }

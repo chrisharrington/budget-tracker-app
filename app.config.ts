@@ -23,7 +23,8 @@ export default {
             adaptiveIcon: {
                 foregroundImage: "./assets/icon-foreground.png",
                 backgroundColor: "#059C6B"
-            }
+            },
+            permissions: ['android.permission.INTERNET']
         },
         notification: {
             icon: "./assets/status-bar-icon.png",
@@ -42,6 +43,13 @@ export default {
         },
         updates: {
             url: "https://u.expo.dev/160e6714-0a9e-4efa-9f13-cbde6800ec70"
-        }
+        },
+        plugins: [
+            ["expo-build-properties", {
+                "android": {
+                    "usesCleartextTraffic": true
+                },
+            }]
+        ]
     }
 };
