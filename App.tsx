@@ -2,23 +2,18 @@ import 'expo-dev-client';
 import 'react-native-gesture-handler';
 
 import React, { useRef } from 'react';
-import { StyleSheet, View, LogBox, Text } from 'react-native';
+import { StyleSheet, View, LogBox } from 'react-native';
 import Constants from 'expo-constants';
 import { NavigationContainer } from '@react-navigation/native';
-import { BottomTabBarProps, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Colours from './lib/colours';
 import { Toast, ToastHandle } from './lib/components/toast';
 import { TransactionsScreen } from '@lib/screens/transactions';
 import { StateContext } from '@lib/context';
-import { QuinnAllowancesScreen, ZoeAllowancesScreen } from '@lib/screens/allowances';
-import { TabParamList } from '@lib/models';
 import { StatusBar } from 'expo-status-bar';
 import { useNotifications } from '@lib/hooks/notifications';
 import { useFonts } from '@lib/hooks/fonts';
 
 LogBox.ignoreLogs(['new NativeEventEmitter()']);
-
-const Tab = createBottomTabNavigator<TabParamList>();
 
 export default function App() {
     const toast = useRef<ToastHandle>(null);
